@@ -64,14 +64,14 @@ namespace DiscordEmbedBuilder
                 {
                     if (args.Length == 7) // async without await because we don't expect a reply
                     {
-                        Discord.HandleRequest(args);
-
                         string embedsJson = string.Format(@"
                         {{
                             ""embeds"": [{{0}}]
                         }}", args[6]);
 
-                        output.Append(embedsJson); 
+                        output.Append(embedsJson);
+
+                        Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
                     }
