@@ -71,12 +71,11 @@ namespace DiscordEmbedBuilder
                         package.Add(new StringContent(tts), "tts");
 
 
-                        byte[] fileBytes = new byte[fileStream.Length];
-                        await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
-
                         //- Send File .png
-                        if (filePath.Count > 0)
+                        if (filePath.Length > 0)
                         {
+                            byte[] fileBytes = new byte[fileStream.Length];
+                            await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
                             package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
                         }
 
@@ -132,7 +131,7 @@ namespace DiscordEmbedBuilder
 
         private static List<Types.EmbedData> BuildEmbedList(string input)
         {
-            List<string> embedsData = ParseStringToList(input);
+            List<List<string>> embedsData = ParseStringToList(input);
 
             // var embeds = new List<Types.EmbedData>();
 
