@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -17,15 +18,25 @@ namespace DiscordEmbedBuilder
     {
         internal static async Task HandleRequest(string[] args)
         {
-            try
-            {
+                try
+                {
                 // Remove arma quotations
                 string url = args[0].Trim('"').Replace("\"\"", "\"");
                 string content = args[1].Trim('"').Replace("\"\"", "\"");
                 string username = args[2].Trim('"').Replace("\"\"", "\"");
                 string avatar = args[3].Trim('"').Replace("\"\"", "\"");
                 bool tts = Convert.ToBoolean(args[4]);
-                Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[5]);
+
+                //- File Stream
+                string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
+
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+
+                byte[] fileBytes = new byte[fileStream.Length];
+                await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
+                content.Add(new ByteArrayContent(fileBytes), "file", "file.png");
+
+                Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
 
                 // Discord 2000 character limit
                 if (content.Length > 1999) content = content.Substring(0, 1999);
