@@ -28,7 +28,15 @@ namespace DiscordEmbedBuilder
                     string username = args[2].Trim('"').Replace("\"\"", "\"");
                     string avatar = args[3].Trim('"').Replace("\"\"", "\"");
                     string tts = args[4];
-                    string embeds = args[6];
+                    // string embeds = args[6];
+                    string embeds = "embeds": [
+                            {
+                                "title": "TITLE",
+                                "description": "Description of Embed",
+                                "color": 16711680
+                            }
+                        ]
+                    };
 
                     //- File Stream
                     string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
@@ -64,10 +72,7 @@ namespace DiscordEmbedBuilder
                         }
                     }
 
-                    string embedsJson = string.Format(@"
-                    {{
-                        ""embeds"": [{{0}}]
-                    }}", embeds);
+                    string embedsJson = embeds;
                     
                     // Build embeds array
                     /*Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
