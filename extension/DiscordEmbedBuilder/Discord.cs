@@ -54,17 +54,16 @@ namespace DiscordEmbedBuilder
                     }
 
                     // Build embeds array
-                    var embedsData = DeserializeObject<List<object>>(args[6]);
+                    var embedsData = DeserializeObject<List<List<object>>>(args[6]);
                     // List<List<object>> embedList = BuildEmbedList(embedsData);
                     string embedsJson = BuildEmbedsJson(embedsData);
 
                     var embeds = new List<Types.EmbedData>();
                     foreach (var data in embedsData)
                     {
-                        embeds.Add(new EmbedData(data));
+                        embeds.Add(new Types.EmbedData(data));
                     }
 
-                    string embedsJson = BuildEmbedsJson(embeds);
                     // if (embedsData.Length > 0) package.Add(new StringContent(embedProperty, Encoding.UTF8), "payload_json");
 
                     // JArray embedProperty = new JArray();
@@ -95,28 +94,6 @@ namespace DiscordEmbedBuilder
             {
                 Tools.Logger(e);
             }
-        }
-
-        private static string BuildEmbedsJson(List<Types.EmbedData> embeds)
-        {
-            var embedsJson = new StringBuilder();
-            embedsJson.Append("{ \"embeds\": [");
-
-            foreach (var embed in embeds)
-            {
-                embedsJson.Append(BuildEmbedJson(embed));
-                embedsJson.Append(",");
-            }
-
-            // Remove the last comma
-            if (embedsJson[embedsJson.Length - 1] == ',')
-            {
-                embedsJson.Remove(embedsJson.Length - 1, 1);
-            }
-
-            embedsJson.Append("]}");
-
-            return embedsJson.ToString();
         }
 
         private static T DeserializeObject<T>(string value)
@@ -152,7 +129,7 @@ namespace DiscordEmbedBuilder
             return embedsJson.ToString();
         }
 
-        static string BuildEmbedJson(EmbedData embed)
+        static string BuildEmbedJson(Types.EmbedData embed)
         {
             return $@"
             {{
