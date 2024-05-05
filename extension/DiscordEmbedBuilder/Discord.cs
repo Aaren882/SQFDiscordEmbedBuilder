@@ -100,6 +100,7 @@ namespace DiscordEmbedBuilder
 
         private static T DeserializeObject<T>(string value)
         {
+            Tools.Logger(null, value);
             value = value.Replace("\"\"", "\\\"\\\"");
             value = new Regex("([[,]?)nil([],]+)").Replace(value, "$1null$2");
             Tools.Logger(null, value);
