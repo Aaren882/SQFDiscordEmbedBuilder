@@ -76,7 +76,8 @@ namespace DiscordEmbedBuilder
                         if (embedObject.Count > 0) embedProperty.Add(embedObject);
                     }
                     //if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
-                    if (embedProperty.Count() > 0) package.Add(new ByteArrayContent(embedProperty), "embeds");
+
+                    if (embedProperty.Count() > 0) package.Add(new StringContent(embedProperty.ToString, Encoding.UTF8), "payload_json");
 
                     // Execute webhook
                     ServicePointManager.Expect100Continue = true;
