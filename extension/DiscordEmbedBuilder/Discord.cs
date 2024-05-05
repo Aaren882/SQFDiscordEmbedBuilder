@@ -28,15 +28,7 @@ namespace DiscordEmbedBuilder
                     string username = args[2].Trim('"').Replace("\"\"", "\"");
                     string avatar = args[3].Trim('"').Replace("\"\"", "\"");
                     string tts = args[4];
-                    // string embeds = args[6];
-                    string embeds = string.Format(@"
-                    {{
-                        ""embeds"": [
-                        {
-                            ""{0}""
-                        }
-                    ]
-                    }}", args[6].Trim('"'));
+                    Types.EmbedsArray embeds = args[6];
 
                     //- File Stream
                     string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
@@ -55,9 +47,6 @@ namespace DiscordEmbedBuilder
                     package.Add(new StringContent(content), "content");
                     package.Add(new StringContent(tts), "tts");
 
-                    //if (username.Length > 0) package.Add(new JProperty("username", username));
-                    //if (avatar.Length > 0) package.Add(new JProperty("avatar_url", avatar));
-
                     if (username.Length > 0) package.Add(new StringContent(username), "username");
                     if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
 
@@ -71,7 +60,22 @@ namespace DiscordEmbedBuilder
                             package.Add(new ByteArrayContent(fileBytes), "file", "file.png");
                         }
                     }
+
                     
+                    // Prepare the embed JSON data
+                    string embedsJson = BuildEmbedJson(
+                        title: embeds[0],
+                        description: embeds[1],
+                        color: embeds[2],
+                        authorName: embeds[3],
+                        authorUrl: embeds[4],
+                        authorIconUrl: embeds[5],
+                        imageUrl: embeds[6],
+                        thumbnailUrl: embeds[7],
+                        footerText: embeds[8],
+                        footerIconUrl: embeds[9]
+                    );
+
                     // Build embeds array
                     /*Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
                     List<Types.EmbedArray> embedList = BuildEmbedList(embeds);
@@ -85,7 +89,7 @@ namespace DiscordEmbedBuilder
                     }*/
                     //if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
 
-                    if (embeds.Length > 0) package.Add(new StringContent(embeds, Encoding.UTF8), "payload_json");
+                    if (embeds.Length > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
 
                     // Execute webhook
                     ServicePointManager.Expect100Continue = true;
@@ -184,6 +188,46 @@ namespace DiscordEmbedBuilder
 
             return embedObject;
         }*/
+
+        private static string BuildEmbedJson (
+            string title,
+            string description,
+            int color,
+            string authorName = null,
+            string authorUrl = null,
+            string authorIconUrl = null,
+            string imageUrl = null,
+            string thumbnailUrl = null,
+            string footerText = null,
+            string footerIconUrl = null
+        ) {
+
+            return $@"
+            {{
+                ""embeds"": [
+                    {{
+                        ""title"": ""{title}"",
+                        ""description"": ""{description}"",
+                        ""color"": {color},
+                        ""author"": {{
+                            ""name"": ""{authorName}"",
+                            ""url"": ""{authorUrl}"",
+                            ""icon_url"": ""{authorIconUrl}""
+                        }},
+                        ""image"": {{
+                            ""url"": ""{imageUrl}""
+                        }},
+                        ""thumbnail"": {{
+                            ""url"": ""{thumbnailUrl}""
+                        }},
+                        ""footer"": {{
+                            ""text"": ""{footerText}"",
+                            ""icon_url"": ""{footerIconUrl}""
+                        }}
+                    }}
+                ]
+            }}";
+        }
 
         private static JObject BuildFieldObject(Types.EmbedField field)
         {
