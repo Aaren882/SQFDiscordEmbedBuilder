@@ -56,17 +56,17 @@ namespace DiscordEmbedBuilder
 
                     // Build embeds array
                     string Rawdata = args[6].Trim('[', ']');
-                    List<string> embedsData = new List<string>(Rawdata.Split("],["));
+                    List<string> embedsData = new List<string>(Rawdata.Split(new string[] { "],[" },StringSplitOptions.None));
 
                     var embeds = new List<Types.EmbedData>();
 
                     foreach (var data in embedsData)
                     {
-                        embeds.Add(new EmbedData(new List<string>(data.Split(","))));
+                        embeds.Add(new EmbedData(new List<string>(data.Split(new string[] { "," }, StringSplitOptions.None))));
                     }
 
 
-                    // if (embedsData.Length > 0) package.Add(new StringContent(embedProperty, Encoding.UTF8), "payload_json");
+                    if (embedsData.Count > 0) package.Add(new StringContent(BuildEmbedsJson(embeds), Encoding.UTF8), "payload_json");
 
                     // Build embeds array
                     //Types.EmbedData embeds = DeserializeObject<Types.EmbedData>(args[6]);
