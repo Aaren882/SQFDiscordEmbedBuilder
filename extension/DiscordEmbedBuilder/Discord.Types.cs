@@ -15,21 +15,20 @@ namespace DiscordEmbedBuilder
             public string ThumbnailUrl { get; set; }
             public string FooterText { get; set; }
             public string FooterIconUrl { get; set; }
-            static string defaultStr = @"""""";
 
             public EmbedData(List<string> data)
             {
-                Title = data.Count > 0 ? (string)data[0] : defaultStr;
-                Description = data.Count > 1 ? (string)data[1] : defaultStr;
-                Color = data.Count > 2 ? (string)data[2] : defaultStr;
+                Title = data.Count > 0 ? (string)data[0] : "";
+                Description = data.Count > 1 ? (string)data[1] : "";
+                Color = data.Count > 2 ? (string)data[2] : "14177041";
 
-                AuthorName = data.Count > 3 ? (string)data[3] : defaultStr;
-                AuthorUrl = data.Count > 4 ? (string)data[4] : defaultStr;
-                AuthorIconUrl = data.Count > 5 ? (string)data[5] : defaultStr;
-                ImageUrl = data.Count > 6 ? (string)data[6] : defaultStr;
-                ThumbnailUrl = data.Count > 7 ? (string)data[7] : defaultStr;
-                FooterText = data.Count > 8 ? (string)data[8] : defaultStr;
-                FooterIconUrl = data.Count > 9 ? (string)data[9] : defaultStr;
+                AuthorName = data.Count > 3 ? (string)data[3] : "";
+                AuthorUrl = data.Count > 4 ? (string)data[4] : "";
+                AuthorIconUrl = data.Count > 5 ? (string)data[5] : "";
+                ImageUrl = data.Count > 6 ? (string)data[6] : "";
+                ThumbnailUrl = data.Count > 7 ? (string)data[7] : "";
+                FooterText = data.Count > 8 ? (string)data[8] : "";
+                FooterIconUrl = data.Count > 9 ? (string)data[9] : "";
             }
         }
         /*public class EmbedArray
