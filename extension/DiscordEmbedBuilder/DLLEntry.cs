@@ -68,7 +68,7 @@ namespace DiscordEmbedBuilder
 
                         string embedsJson = string.Format(@"
                         {{
-                            ""embeds"": {0}
+                            ""embeds"": [{{0}}]
                         }}", args[6]);
 
                         output.Append(embedsJson); 
