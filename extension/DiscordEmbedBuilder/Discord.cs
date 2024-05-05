@@ -55,8 +55,14 @@ namespace DiscordEmbedBuilder
                     }
 
                     // Build embeds array
-                    var embedsData = DeserializeObject<List<List<object>>>(args[6]);
-                    List<Types.EmbedData> embedList = BuildEmbedList(embedsData);
+                    List<string> embedsData = new List<string>(args[6].Trim('[', ']').Split("],["));
+
+                    var embeds = new List<Types.EmbedData>();
+
+                    foreach (var data in embedsData)
+                    {
+                        embeds.Add(new EmbedData(new List<string>(data.Split(","))));
+                    }
 
 
                     // if (embedsData.Length > 0) package.Add(new StringContent(embedProperty, Encoding.UTF8), "payload_json");
@@ -95,7 +101,7 @@ namespace DiscordEmbedBuilder
             }
         }
 
-        private static T DeserializeObject<T>(string value)
+        /*private static T DeserializeObject<T>(string value)
         {
             value = value.Replace("\"\"", "\\\"\\\"");
             value = new Regex("([[,]?)nil([],]+)").Replace(value, "$1null$2");
@@ -104,32 +110,24 @@ namespace DiscordEmbedBuilder
             {
                 new ArmaJsonConverter()
             });
-        }
+        }*/
 
-        private static List<Types.EmbedData> BuildEmbedList(List<List<object>> input)
-        {
-            var embeds = new List<Types.EmbedData>();
-            foreach (var data in input)
-            {
-                Tools.Logger(null, $"{input},{data}");
-
-                embeds.Add(new Types.EmbedData(data));
-            }
-            return embeds;
-            //string embedsJson = BuildEmbedsJson(embeds);
-            /*return new List<Types.EmbedData>() {
-                input.Title,
-                input.Description,
-                input.Color,
-                input.AuthorName,
-                input.AuthorUrl,
-                input.AuthorIconUrl,
-                input.ImageUrl,
-                input.ThumbnailUrl,
-                input.FooterText,
-                input.FooterIconUrl
-            };*/
-        }
+        // private static List<Types.EmbedData> BuildEmbedList(List<List<object>> input)
+        // {
+        //     //string embedsJson = BuildEmbedsJson(embeds);
+        //     /*return new List<Types.EmbedData>() {
+        //         input.Title,
+        //         input.Description,
+        //         input.Color,
+        //         input.AuthorName,
+        //         input.AuthorUrl,
+        //         input.AuthorIconUrl,
+        //         input.ImageUrl,
+        //         input.ThumbnailUrl,
+        //         input.FooterText,
+        //         input.FooterIconUrl
+        //     };*/
+        // }
 
         static string BuildEmbedsJson(List<Types.EmbedData> embeds)
         {
