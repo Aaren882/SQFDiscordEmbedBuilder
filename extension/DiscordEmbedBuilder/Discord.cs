@@ -28,7 +28,6 @@ namespace DiscordEmbedBuilder
                     string username = args[2].Trim('"').Replace("\"\"", "\"");
                     string avatar = args[3].Trim('"').Replace("\"\"", "\"");
                     string tts = args[4];
-                    Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray> (args[6]);
 
                     //- File Stream
                     string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
@@ -61,23 +60,8 @@ namespace DiscordEmbedBuilder
                         }
                     }
 
-                    
-                    // Prepare the embed JSON data
-                    string embedsJson = BuildEmbedJson(
-                        title: embeds[0],
-                        description: embeds[1],
-                        color: embeds[2],
-                        authorName: embeds[3],
-                        authorUrl: embeds[4],
-                        authorIconUrl: embeds[5],
-                        imageUrl: embeds[6],
-                        thumbnailUrl: embeds[7],
-                        footerText: embeds[8],
-                        footerIconUrl: embeds[9]
-                    );
-
                     // Build embeds array
-                    /*Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
+                    Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
                     List<Types.EmbedArray> embedList = BuildEmbedList(embeds);
                     JArray embedProperty = new JArray();
                     for (int i = 0; i < 10; i++)
@@ -86,8 +70,8 @@ namespace DiscordEmbedBuilder
                         if (embed == null) break;
                         JObject embedObject = BuildEmbedObject(embed);
                         if (embedObject.Count > 0) embedProperty.Add(embedObject);
-                    }*/
-                    //if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
+                    }
+                    if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
 
                     if (embeds.Length > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
 
@@ -99,12 +83,6 @@ namespace DiscordEmbedBuilder
                          SecurityProtocolType.Ssl3;
                     using (HttpClient APIClient = new HttpClient())
                     {
-                        // APIClient.BaseAddress = new Uri("https://discord.com/api/webhooks/");
-                        // APIClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        // HttpResponseMessage response = await APIClient.PostAsync(url, new StringContent(JsonConvert.SerializeObject(package), Encoding.UTF8, "application/json"));
-                        // //Tools.Logger(null,package.ToString());
-                        // await Tools.LogAsyncReply(response.Content);
-
                         HttpResponseMessage response = await APIClient.PostAsync(url, package);
                     }
                 }
@@ -129,7 +107,7 @@ namespace DiscordEmbedBuilder
         // The arma array deserializer doesnt like empty strings and I dont know how to fix it, so heres a shit work around
         private static string RemoveReservedString(string input) => input == $"{(char)1}" ? "" : input;
 
-        /*private static JObject BuildEmbedObject(Types.EmbedArray embed)
+        private static JObject BuildEmbedObject(Types.EmbedArray embed)
         {
             JObject embedObject = new JObject();
             Types.EmbedAuthor embedAuthor = embed.author;
@@ -187,46 +165,6 @@ namespace DiscordEmbedBuilder
             if (fieldProperty.Count() > 0) embedObject.Add(new JProperty("fields", fieldProperty));
 
             return embedObject;
-        }*/
-
-        private static string BuildEmbedJson (
-            string title,
-            string description,
-            int color,
-            string authorName = null,
-            string authorUrl = null,
-            string authorIconUrl = null,
-            string imageUrl = null,
-            string thumbnailUrl = null,
-            string footerText = null,
-            string footerIconUrl = null
-        ) {
-
-            return $@"
-            {{
-                ""embeds"": [
-                    {{
-                        ""title"": ""{title}"",
-                        ""description"": ""{description}"",
-                        ""color"": {color},
-                        ""author"": {{
-                            ""name"": ""{authorName}"",
-                            ""url"": ""{authorUrl}"",
-                            ""icon_url"": ""{authorIconUrl}""
-                        }},
-                        ""image"": {{
-                            ""url"": ""{imageUrl}""
-                        }},
-                        ""thumbnail"": {{
-                            ""url"": ""{thumbnailUrl}""
-                        }},
-                        ""footer"": {{
-                            ""text"": ""{footerText}"",
-                            ""icon_url"": ""{footerIconUrl}""
-                        }}
-                    }}
-                ]
-            }}";
         }
 
         private static JObject BuildFieldObject(Types.EmbedField field)
@@ -243,7 +181,7 @@ namespace DiscordEmbedBuilder
         }
 
         // I don't know the best way to do this, I'm limited by my lack of C# knowledge and how I understand the deserializer to work
-        /*private static List<Types.EmbedArray> BuildEmbedList(Types.EmbedsArray input)
+        private static List<Types.EmbedArray> BuildEmbedList(Types.EmbedsArray input)
         {
             return new List<Types.EmbedArray>() {
                 input.embed1,
@@ -257,7 +195,7 @@ namespace DiscordEmbedBuilder
                 input.embed9,
                 input.embed10
             };
-        }*/
+        }
         private static List<Types.EmbedField> BuildFieldList(Types.EmbedFields input)
         {
             return new List<Types.EmbedField>() {
