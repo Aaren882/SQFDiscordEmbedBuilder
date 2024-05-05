@@ -29,14 +29,16 @@ namespace DiscordEmbedBuilder
                     string avatar = args[3].Trim('"').Replace("\"\"", "\"");
                     string tts = args[4];
                     // string embeds = args[6];
-                    string embeds = "embeds": [
-                            {
-                                "title": "TITLE",
-                                "description": "Description of Embed",
-                                "color": 16711680
-                            }
+                    string embeds = string.Format(@"
+                    {{
+                        ""embeds"": [
+                            {{
+                                ""title"": ""{0}"",
+                                ""description"": ""{1}"",
+                                ""color"": {2}
+                            }}
                         ]
-                    };
+                    }}", "Title of Embed", "Description of Embed", 16711680);
 
                     //- File Stream
                     string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
