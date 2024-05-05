@@ -98,9 +98,6 @@ namespace DiscordEmbedBuilder
                         // //Tools.Logger(null,package.ToString());
                         // await Tools.LogAsyncReply(response.Content);
 
-                        Tools.Logger(package.ToString());
-                        Tools.Logger(url);
-
                         HttpResponseMessage response = await APIClient.PostAsync(url, package);
                     }
                 }

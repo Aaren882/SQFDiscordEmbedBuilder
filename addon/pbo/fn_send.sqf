@@ -29,3 +29,17 @@ params [
 private _key = uiNamespace getVariable ["DiscordEmbedBuilder_SessionKey",{""}];
 "DiscordEmbedBuilder" callExtension [call _key,[_webhookurl,_message,_username,_avatar,_tts,_embeds]];
 true
+
+
+"DiscordEmbedBuilder" callExtension [ 
+ call DiscordEmbedBuilder_SessionKey,  
+ [ 
+  "https://discord.com/api/webhooks/1236040735065767936/9fJ6Joxk6zAZ5d8WNTNh3RTpnWVV1PlVMJYJNlua3cpCTnJj6x2YsSMNWTcBZeLE12XO", 
+  "WW", 
+  "", 
+  "", 
+  false,
+	"" ,
+  format ['"%1": "%2"',"title","TITLE"]
+ ] 
+];
