@@ -24,10 +24,10 @@ namespace DiscordEmbedBuilder
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
                     // Remove arma quotations
-                    string url = args[0].Trim('"').Replace("\"\"", "\"");
-                    string content = args[1].Trim('"').Replace("\"\"", "\"");
-                    string username = args[2].Trim('"').Replace("\"\"", "\"");
-                    string avatar = args[3].Trim('"').Replace("\"\"", "\"");
+                    string url = args[0].Trim('"',' ').Replace("\"\"", "\"");
+                    string content = args[1].Trim('"',' ').Replace("\"\"", "\"");
+                    string username = args[2].Trim('"',' ').Replace("\"\"", "\"");
+                    string avatar = args[3].Trim('"',' ').Replace("\"\"", "\"");
                     string tts = args[4];
 
                     //- File Stream
@@ -39,23 +39,6 @@ namespace DiscordEmbedBuilder
                     // Build embeds array
                     List<Types.EmbedData> embeds = BuildEmbedList(args[6]);
                     string embedsJson = BuildEmbedsJson(embeds);
-
-
-                    // Build embeds array
-                    //Types.EmbedData embeds = DeserializeObject<Types.EmbedData>(args[6]);
-                    //List<Types.EmbedData> embedList = BuildEmbedList(embeds);
-                    // JArray embedProperty = new JArray();
-                    // for (int i = 0; i < 10; i++)
-                    // {
-                    //     Types.EmbedArray embed = embedList.ElementAt(i);
-                    //     if (embed == null) break;
-                    //     JObject embedObject = BuildEmbedObject(embed);
-                    //     if (embedObject.Count > 0) embedProperty.Add(embedObject);
-                    // }
-                    // if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
-
-                    // if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
-
 
                     // Execute webhook
                     ServicePointManager.Expect100Continue = true;
@@ -148,18 +131,6 @@ namespace DiscordEmbedBuilder
             Tools.Logger(null, embeds.ToString());
 
             return embeds;
-            /*return new List<Types.EmbedData>() {
-                input.Title,
-                input.Description,
-                input.Color,
-                input.AuthorName,
-                input.AuthorUrl,
-                input.AuthorIconUrl,
-                input.ImageUrl,
-                input.ThumbnailUrl,
-                input.FooterText,
-                input.FooterIconUrl
-            };*/
         }
 
         static string BuildEmbedsJson(List<Types.EmbedData> embeds)
@@ -193,7 +164,7 @@ namespace DiscordEmbedBuilder
                 ""color"": ""{embed.Color}"",
                 ""author"": {{
                     ""name"": ""{embed.AuthorName}"",
-                    ""url"": ""{embed.AuthorUrl}"",
+                    ""url"": ""{embed.tts}"",
                     ""icon_url"": ""{embed.AuthorIconUrl}""
                 }},
                 ""image"": {{
