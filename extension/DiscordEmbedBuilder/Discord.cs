@@ -32,8 +32,6 @@ namespace DiscordEmbedBuilder
                     //- File Stream
                     string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
 
-                    Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
-
                     // Discord 2000 character limit
                     if (content.Length > 1999) content = content.Substring(0, 1999);
 
@@ -65,7 +63,13 @@ namespace DiscordEmbedBuilder
                         }
                     }
 
+                    string embedsJson = string.Format(@"
+                    {{
+                        ""embeds"": {0}
+                    }}", args[6]);
+                    
                     // Build embeds array
+                    /*Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
                     List<Types.EmbedArray> embedList = BuildEmbedList(embeds);
                     JArray embedProperty = new JArray();
                     for (int i = 0; i < 10; i++)
@@ -74,10 +78,10 @@ namespace DiscordEmbedBuilder
                         if (embed == null) break;
                         JObject embedObject = BuildEmbedObject(embed);
                         if (embedObject.Count > 0) embedProperty.Add(embedObject);
-                    }
+                    }*/
                     //if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
 
-                    if (embedProperty.Count() > 0) package.Add(new StringContent(embedProperty.ToString, Encoding.UTF8), "payload_json");
+                    if (embedProperty.Count() > 0) package.Add(new StringContent(embedsJson, Encoding.UTF32), "payload_json");
 
                     // Execute webhook
                     ServicePointManager.Expect100Continue = true;
