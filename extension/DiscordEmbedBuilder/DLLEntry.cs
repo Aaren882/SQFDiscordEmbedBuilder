@@ -71,7 +71,7 @@ namespace DiscordEmbedBuilder
 
                         output.Append(embedsJson);
 
-                        Discord.HandleRequest(args);
+                        //Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
                     }

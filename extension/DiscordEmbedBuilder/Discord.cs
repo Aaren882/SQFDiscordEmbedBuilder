@@ -82,7 +82,7 @@ namespace DiscordEmbedBuilder
                     }*/
                     //if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
 
-                    if (embeds.Length > 0) package.Add(new StringContent(embedsJson, Encoding.UTF32), "payload_json");
+                    if (embeds.Length > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
 
                     // Execute webhook
                     ServicePointManager.Expect100Continue = true;
@@ -92,11 +92,13 @@ namespace DiscordEmbedBuilder
                          SecurityProtocolType.Ssl3;
                     using (HttpClient APIClient = new HttpClient())
                     {
-                        APIClient.BaseAddress = new Uri("https://discord.com/api/webhooks/");
-                        APIClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        HttpResponseMessage response = await APIClient.PostAsync(url, new StringContent(JsonConvert.SerializeObject(package), Encoding.UTF8, "application/json"));
-                        //Tools.Logger(null,package.ToString());
-                        await Tools.LogAsyncReply(response.Content);
+                        // APIClient.BaseAddress = new Uri("https://discord.com/api/webhooks/");
+                        // APIClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        // HttpResponseMessage response = await APIClient.PostAsync(url, new StringContent(JsonConvert.SerializeObject(package), Encoding.UTF8, "application/json"));
+                        // //Tools.Logger(null,package.ToString());
+                        // await Tools.LogAsyncReply(response.Content);
+
+                        HttpResponseMessage response = await APIClient.PostAsync(url, package);
                     }
                 }
             }
