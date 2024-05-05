@@ -54,9 +54,9 @@ namespace DiscordEmbedBuilder
                     }
 
                     // Build embeds array
-                    // var embedsData = DeserializeObject<List<List<object>>>(args[6]);
+                    Types.EmbedData embedsData = DeserializeObject<Types.EmbedData>(args[6]);
                     // List<List<object>> embedList = BuildEmbedList(embedsData);
-                    List<List<object>> embedsData = args[6];
+                    // List<List<object>> embedsData = args[6];
 
                     var embeds = new List<Types.EmbedData>();
                     foreach (var data in embedsData)
@@ -68,7 +68,10 @@ namespace DiscordEmbedBuilder
 
 
                     // if (embedsData.Length > 0) package.Add(new StringContent(embedProperty, Encoding.UTF8), "payload_json");
+
+                    // Build embeds array
                     // Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
+                    // List<Types.EmbedArray> embedList = BuildEmbedList(embeds);
                     // JArray embedProperty = new JArray();
                     // for (int i = 0; i < 10; i++)
                     // {
@@ -77,6 +80,7 @@ namespace DiscordEmbedBuilder
                     //     JObject embedObject = BuildEmbedObject(embed);
                     //     if (embedObject.Count > 0) embedProperty.Add(embedObject);
                     // }
+                    // if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
 
                     // if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
 
