@@ -28,7 +28,7 @@ namespace DiscordEmbedBuilder
                     string username = args[2].Trim('"').Replace("\"\"", "\"");
                     string avatar = args[3].Trim('"').Replace("\"\"", "\"");
                     string tts = args[4];
-                    Types.EmbedsArray embeds = args[6];
+                    Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray> (args[6]);
 
                     //- File Stream
                     string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
