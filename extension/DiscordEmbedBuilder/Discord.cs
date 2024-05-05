@@ -32,13 +32,11 @@ namespace DiscordEmbedBuilder
                     string embeds = string.Format(@"
                     {{
                         ""embeds"": [
-                            {{
-                                ""title"": ""{0}"",
-                                ""description"": ""{1}"",
-                                ""color"": {2}
-                            }}
-                        ]
-                    }}", "Title of Embed", "Description of Embed", 16711680);
+                        {
+                            ""{0}""
+                        }
+                    ]
+                    }}", args[6].Trim('"'));
 
                     //- File Stream
                     string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
@@ -73,8 +71,6 @@ namespace DiscordEmbedBuilder
                             package.Add(new ByteArrayContent(fileBytes), "file", "file.png");
                         }
                     }
-
-                    string embedsJson = embeds;
                     
                     // Build embeds array
                     /*Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
@@ -89,7 +85,7 @@ namespace DiscordEmbedBuilder
                     }*/
                     //if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
 
-                    if (embeds.Length > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
+                    if (embeds.Length > 0) package.Add(new StringContent(embeds, Encoding.UTF8), "payload_json");
 
                     // Execute webhook
                     ServicePointManager.Expect100Continue = true;
