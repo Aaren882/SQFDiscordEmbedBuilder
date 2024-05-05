@@ -43,3 +43,20 @@ true
   format ['"%1": "%2"',"title","TITLE"]
  ] 
 ];
+
+str [
+	{
+		"title": "TITLE",
+		"description": "Description of Embed",
+		"color": 16711680
+	}
+]
+" 
+  '""embeds"": [ 
+    { 
+      ""title"": ""TITLE"", 
+      ""description"": ""Description of Embed"", 
+      ""color"": 16711680 
+    } 
+  ]' 
+"
