@@ -58,7 +58,7 @@ namespace DiscordEmbedBuilder
                     // List<List<object>> embedList = BuildEmbedList(embedsData);
                     string embedsJson = BuildEmbedsJson(embedsData);
 
-                    var embeds = new List<EmbedData>();
+                    var embeds = new List<Types.EmbedData>();
                     foreach (var data in embedsData)
                     {
                         embeds.Add(new EmbedData(data));
@@ -97,7 +97,7 @@ namespace DiscordEmbedBuilder
             }
         }
 
-        private static string BuildEmbedsJson(List<EmbedData> embeds)
+        private static string BuildEmbedsJson(List<Types.EmbedData> embeds)
         {
             var embedsJson = new StringBuilder();
             embedsJson.Append("{ \"embeds\": [");
@@ -130,7 +130,7 @@ namespace DiscordEmbedBuilder
             });
         }
 
-        static string BuildEmbedsJson(List<EmbedData> embeds)
+        static string BuildEmbedsJson(List<Types.EmbedData> embeds)
         {
             var embedsJson = new StringBuilder();
             embedsJson.Append("{ \"embeds\": [");
