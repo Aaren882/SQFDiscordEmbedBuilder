@@ -63,7 +63,7 @@ namespace DiscordEmbedBuilder
                          SecurityProtocolType.Tls |
                          SecurityProtocolType.Tls11 |
                          SecurityProtocolType.Ssl3;
-                    using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+                    
                     using (HttpClient APIClient = new HttpClient())
                     {
                         // Bare bones
@@ -74,9 +74,12 @@ namespace DiscordEmbedBuilder
                         //- Send File .png
                         if (filePath.Length > 0)
                         {
-                            byte[] fileBytes = new byte[fileStream.Length];
-                            await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
-                            package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
+                            using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+                            {
+                                byte[] fileBytes = new byte[fileStream.Length];
+                                await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
+                                package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
+                            }
                         }
 
                         if (username.Length > 0) package.Add(new StringContent(username), "username");
