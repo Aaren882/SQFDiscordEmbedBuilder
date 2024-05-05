@@ -40,7 +40,12 @@ true
   "", 
   false,
 	"" ,
-  format ['"%1": "%2"',"title","TITLE"]
+  [
+		[
+			"TITLE",
+			"DESC"
+		]
+	]
  ] 
 ];
 
