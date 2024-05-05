@@ -54,12 +54,12 @@ namespace DiscordEmbedBuilder
                     }
 
                     // Build embeds array
-                    Types.EmbedData embedsData = DeserializeObject<Types.EmbedData>(args[6]);
+                    var embedsData = DeserializeObject<Types.EmbedData>(args[6]);
                     // List<List<object>> embedList = BuildEmbedList(embedsData);
                     // List<List<object>> embedsData = args[6];
 
                     var embeds = new List<Types.EmbedData>();
-                    foreach (var data in embedsData)
+                    foreach (var data in embedList)
                     {
                         embeds.Add(new Types.EmbedData(data));
                     }
@@ -162,22 +162,23 @@ namespace DiscordEmbedBuilder
             }}";
         }
 
-        // I don't know the best way to do this, I'm limited by my lack of C# knowledge and how I understand the deserializer to work
-        /*private static List<Types.EmbedData> BuildEmbedList(Types.EmbedData input)
+        private static List<Types.EmbedData> BuildEmbedList(Types.EmbedData input)
         {
             return new List<Types.EmbedData>() {
-                input.title,
-                input.description,
-                input.url,
-                input.color,
-                input.useTimestamp,
-                input.thumbnail,
-                input.image,
-                input.author,
-                input.footer,
-                input.fields
+                input.Title,
+                input.Description,
+                input.Color,
+                input.AuthorName,
+                input.AuthorUrl,
+                input.AuthorIconUrl,
+                input.ImageUrl,
+                input.ThumbnailUrl,
+                input.FooterText,
+                input.FooterIconUrl
             };
-        }*/
+        }
+
+        // I don't know the best way to do this, I'm limited by my lack of C# knowledge and how I understand the deserializer to work
 
         // The arma array deserializer doesnt like empty strings and I dont know how to fix it, so heres a shit work around
         /*private static string RemoveReservedString(string input) => input == $"{(char)1}" ? "" : input;
