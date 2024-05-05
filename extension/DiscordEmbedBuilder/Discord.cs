@@ -54,8 +54,9 @@ namespace DiscordEmbedBuilder
                     }
 
                     // Build embeds array
-                    var embedsData = DeserializeObject<List<List<object>>>(args[6]);
+                    // var embedsData = DeserializeObject<List<List<object>>>(args[6]);
                     // List<List<object>> embedList = BuildEmbedList(embedsData);
+                    List<List<object>> embedsData = args[6];
 
                     var embeds = new List<Types.EmbedData>();
                     foreach (var data in embedsData)
