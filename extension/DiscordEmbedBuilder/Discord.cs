@@ -55,7 +55,8 @@ namespace DiscordEmbedBuilder
                     }
 
                     // Build embeds array
-                    List<string> embedsData = new List<string>(args[6].Trim('[', ']').Split("],["));
+                    string Rawdata = args[6].Trim('[', ']');
+                    List<string> embedsData = new List<string>(Rawdata.Split("],["));
 
                     var embeds = new List<Types.EmbedData>();
 
