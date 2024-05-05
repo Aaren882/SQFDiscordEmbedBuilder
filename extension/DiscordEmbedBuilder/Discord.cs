@@ -36,46 +36,48 @@ namespace DiscordEmbedBuilder
                     if (content.Length > 1999) content = content.Substring(0, 1999);
 
                     // Bare bones
-                    /*JObject package = new JObject(
-                        new JProperty("content", content),
-                        //new JProperty("username", username),
-                        //new JProperty("avatar_url", avatar),
-                        new JProperty("tts", tts)
-                    );*/
-
                     package.Add(new StringContent(content), "content");
                     package.Add(new StringContent(tts), "tts");
 
                     if (username.Length > 0) package.Add(new StringContent(username), "username");
                     if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
 
+                    //- Send File .png
                     if (filePath.Length > 0)
                     {
                         using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
                         {
                             byte[] fileBytes = new byte[fileStream.Length];
                             await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
-                            // package.Add(new JProperty("file", new ByteArrayContent(fileBytes), "file", "file.png"));
                             package.Add(new ByteArrayContent(fileBytes), "file", "file.png");
                         }
                     }
 
                     // Build embeds array
-                    Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
-                    List<Types.EmbedArray> embedList = BuildEmbedList(embeds);
-                    JArray embedProperty = new JArray();
-                    for (int i = 0; i < 10; i++)
+                    var embedsData = DeserializeObject<List<object>>(args[6]);
+                    // List<List<object>> embedList = BuildEmbedList(embedsData);
+                    string embedsJson = BuildEmbedsJson(embedsData);
+
+                    var embeds = new List<EmbedData>();
+                    foreach (var data in embedsData)
                     {
-                        Types.EmbedArray embed = embedList.ElementAt(i);
-                        if (embed == null) break;
-                        JObject embedObject = BuildEmbedObject(embed);
-                        if (embedObject.Count > 0) embedProperty.Add(embedObject);
+                        embeds.Add(new EmbedData(data));
                     }
 
-                    Tools.Logger(embedProperty);
+                    string embedsJson = BuildEmbedsJson(embeds);
+                    // if (embedsData.Length > 0) package.Add(new StringContent(embedProperty, Encoding.UTF8), "payload_json");
+
+                    // JArray embedProperty = new JArray();
+                    // for (int i = 0; i < 10; i++)
+                    // {
+                    //     Types.EmbedArray embed = embedList.ElementAt(i);
+                    //     if (embed == null) break;
+                    //     JObject embedObject = BuildEmbedObject(embed);
+                    //     if (embedObject.Count > 0) embedProperty.Add(embedObject);
+                    // }
+
                     // if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
 
-                    // if (embeds.Length > 0) package.Add(new StringContent(embedProperty, Encoding.UTF8), "payload_json");
 
                     // Execute webhook
                     ServicePointManager.Expect100Continue = true;
@@ -95,6 +97,28 @@ namespace DiscordEmbedBuilder
             }
         }
 
+        private static string BuildEmbedsJson(List<EmbedData> embeds)
+        {
+            var embedsJson = new StringBuilder();
+            embedsJson.Append("{ \"embeds\": [");
+
+            foreach (var embed in embeds)
+            {
+                embedsJson.Append(BuildEmbedJson(embed));
+                embedsJson.Append(",");
+            }
+
+            // Remove the last comma
+            if (embedsJson[embedsJson.Length - 1] == ',')
+            {
+                embedsJson.Remove(embedsJson.Length - 1, 1);
+            }
+
+            embedsJson.Append("]}");
+
+            return embedsJson.ToString();
+        }
+
         private static T DeserializeObject<T>(string value)
         {
             value = value.Replace("\"\"", "\\\"\\\"");
@@ -106,8 +130,72 @@ namespace DiscordEmbedBuilder
             });
         }
 
+        static string BuildEmbedsJson(List<EmbedData> embeds)
+        {
+            var embedsJson = new StringBuilder();
+            embedsJson.Append("{ \"embeds\": [");
+
+            foreach (var embed in embeds)
+            {
+                embedsJson.Append(BuildEmbedJson(embed));
+                embedsJson.Append(",");
+            }
+
+            // Remove the last comma
+            if (embedsJson[embedsJson.Length - 1] == ',')
+            {
+                embedsJson.Remove(embedsJson.Length - 1, 1);
+            }
+
+            embedsJson.Append("]}");
+
+            return embedsJson.ToString();
+        }
+
+        static string BuildEmbedJson(EmbedData embed)
+        {
+            return $@"
+            {{
+                ""title"": ""{embed.Title}"",
+                ""description"": ""{embed.Description}"",
+                ""color"": ""{embed.Color}"",
+                ""author"": {{
+                    ""name"": ""{embed.AuthorName}"",
+                    ""url"": ""{embed.AuthorUrl}"",
+                    ""icon_url"": ""{embed.AuthorIconUrl}""
+                }},
+                ""image"": {{
+                    ""url"": ""{embed.ImageUrl}""
+                }},
+                ""thumbnail"": {{
+                    ""url"": ""{embed.ThumbnailUrl}""
+                }},
+                ""footer"": {{
+                    ""text"": ""{embed.FooterText}"",
+                    ""icon_url"": ""{embed.FooterIconUrl}""
+                }}
+            }}";
+        }
+
+        // I don't know the best way to do this, I'm limited by my lack of C# knowledge and how I understand the deserializer to work
+        /*private static List<Types.EmbedData> BuildEmbedList(Types.EmbedData input)
+        {
+            return new List<Types.EmbedData>() {
+                input.title,
+                input.description,
+                input.url,
+                input.color,
+                input.useTimestamp,
+                input.thumbnail,
+                input.image,
+                input.author,
+                input.footer,
+                input.fields
+            };
+        }*/
+
         // The arma array deserializer doesnt like empty strings and I dont know how to fix it, so heres a shit work around
-        private static string RemoveReservedString(string input) => input == $"{(char)1}" ? "" : input;
+        /*private static string RemoveReservedString(string input) => input == $"{(char)1}" ? "" : input;
 
         private static JObject BuildEmbedObject(Types.EmbedArray embed)
         {
@@ -182,22 +270,6 @@ namespace DiscordEmbedBuilder
             );
         }
 
-        // I don't know the best way to do this, I'm limited by my lack of C# knowledge and how I understand the deserializer to work
-        private static List<Types.EmbedArray> BuildEmbedList(Types.EmbedsArray input)
-        {
-            return new List<Types.EmbedArray>() {
-                input.embed1,
-                input.embed2,
-                input.embed3,
-                input.embed4,
-                input.embed5,
-                input.embed6,
-                input.embed7,
-                input.embed8,
-                input.embed9,
-                input.embed10
-            };
-        }
         private static List<Types.EmbedField> BuildFieldList(Types.EmbedFields input)
         {
             return new List<Types.EmbedField>() {
@@ -227,6 +299,6 @@ namespace DiscordEmbedBuilder
                 input.field24,
                 input.field25
             };
-        }
+        }*/
     }
 }
