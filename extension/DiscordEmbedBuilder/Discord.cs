@@ -75,7 +75,7 @@ namespace DiscordEmbedBuilder
                         await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
 
                         //- Send File .png
-                        if (filePath.Length > 0)
+                        if (filePath.Count > 0)
                         {
                             package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
                         }
