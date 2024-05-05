@@ -66,13 +66,12 @@ namespace DiscordEmbedBuilder
                     {
                         Discord.HandleRequest(args);
 
-                        string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
-                        using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
-                        {
-                            byte[] fileBytes = new byte[fileStream.Length];
-                            output.Append(new JProperty("file", new ByteArrayContent(fileBytes), "file", "file.png"));
-                            output.Append(fileStream);
-                        }
+                        string embedsJson = string.Format(@"
+                        {{
+                            ""embeds"": {0}
+                        }}", args[6]);
+
+                        output.Append(embedsJson); 
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
                     }
