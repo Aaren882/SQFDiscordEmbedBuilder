@@ -1,17 +1,11 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Maca134.Arma.Serializer;
-using System.Text.RegularExpressions;
 using System.Net;
-using static DiscordEmbedBuilder.Types;
 
 namespace DiscordEmbedBuilder
 {
