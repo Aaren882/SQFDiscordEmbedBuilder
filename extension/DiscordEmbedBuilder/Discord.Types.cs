@@ -2,7 +2,7 @@ namespace DiscordEmbedBuilder
 {
     public class Types
     {
-        class EmbedData
+        public class EmbedData
         {
             public string Title { get; set; }
             public string Description { get; set; }
