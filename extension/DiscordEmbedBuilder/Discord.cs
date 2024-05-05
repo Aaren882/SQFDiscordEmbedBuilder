@@ -55,18 +55,9 @@ namespace DiscordEmbedBuilder
                     }
 
                     // Build embeds array
-                    string Rawdata = args[6].Trim('[', ']');
-                    List<string> embedsData = new List<string>(Rawdata.Split(new string[] { "],[" },StringSplitOptions.None));
+                    List<Types.EmbedData> embedsJson = BuildEmbedList(args[6]);
 
-                    var embeds = new List<Types.EmbedData>();
-
-                    foreach (var data in embedsData)
-                    {
-                        embeds.Add(new EmbedData(new List<string>(data.Split(new string[] { "," }, StringSplitOptions.None))));
-                    }
-
-
-                    if (embedsData.Count > 0) package.Add(new StringContent(BuildEmbedsJson(embeds), Encoding.UTF8), "payload_json");
+                    if (embedsData.Count > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
 
                     // Build embeds array
                     //Types.EmbedData embeds = DeserializeObject<Types.EmbedData>(args[6]);
@@ -113,22 +104,35 @@ namespace DiscordEmbedBuilder
             });
         }*/
 
-        // private static List<Types.EmbedData> BuildEmbedList(List<List<object>> input)
-        // {
-        //     //string embedsJson = BuildEmbedsJson(embeds);
-        //     /*return new List<Types.EmbedData>() {
-        //         input.Title,
-        //         input.Description,
-        //         input.Color,
-        //         input.AuthorName,
-        //         input.AuthorUrl,
-        //         input.AuthorIconUrl,
-        //         input.ImageUrl,
-        //         input.ThumbnailUrl,
-        //         input.FooterText,
-        //         input.FooterIconUrl
-        //     };*/
-        // }
+        private static List<Types.EmbedData> BuildEmbedList(string input)
+        {
+            string Rawdata = input.Trim('[', ']');
+            List<string> embedsData = new List<string>(Rawdata.Split(new string[] { "],[" }, StringSplitOptions.None));
+
+            var embeds = new List<Types.EmbedData>();
+
+            foreach (var data in embedsData)
+            {
+                embeds.Add(new EmbedData(new List<string>(data.Split(new string[] { "," }, StringSplitOptions.None))));
+            }
+            
+            Tools.Logger(null, embeds);
+
+            return embeds;
+            //string embedsJson = BuildEmbedsJson(embeds);
+            /*return new List<Types.EmbedData>() {
+                input.Title,
+                input.Description,
+                input.Color,
+                input.AuthorName,
+                input.AuthorUrl,
+                input.AuthorIconUrl,
+                input.ImageUrl,
+                input.ThumbnailUrl,
+                input.FooterText,
+                input.FooterIconUrl
+            };*/
+        }
 
         static string BuildEmbedsJson(List<Types.EmbedData> embeds)
         {
