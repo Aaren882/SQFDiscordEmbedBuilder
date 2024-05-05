@@ -36,30 +36,10 @@ namespace DiscordEmbedBuilder
                     // Discord 2000 character limit
                     if (content.Length > 1999) content = content.Substring(0, 1999);
 
-                    // Bare bones
-                    package.Add(new StringContent(content), "content");
-                    package.Add(new StringContent(tts), "tts");
-
-                    if (username.Length > 0) package.Add(new StringContent(username), "username");
-                    if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
-
-                    //- Send File .png
-                    if (filePath.Length > 0)
-                    {
-                        using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
-                        {
-                            byte[] fileBytes = new byte[fileStream.Length];
-                            await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
-                            package.Add(new ByteArrayContent(fileBytes), "file", "file.png");
-                        }
-                    }
-
                     // Build embeds array
                     List<Types.EmbedData> embeds = BuildEmbedList(args[6]);
                     string embedsJson = BuildEmbedsJson(embeds);
 
-
-                    if (embeds.Count > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
 
                     // Build embeds array
                     //Types.EmbedData embeds = DeserializeObject<Types.EmbedData>(args[6]);
@@ -83,8 +63,27 @@ namespace DiscordEmbedBuilder
                          SecurityProtocolType.Tls |
                          SecurityProtocolType.Tls11 |
                          SecurityProtocolType.Ssl3;
+                    using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
                     using (HttpClient APIClient = new HttpClient())
                     {
+                        // Bare bones
+                        package.Add(new StringContent(content), "content");
+                        package.Add(new StringContent(tts), "tts");
+
+
+                        byte[] fileBytes = new byte[fileStream.Length];
+                        await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
+
+                        //- Send File .png
+                        if (filePath.Length > 0)
+                        {
+                            package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
+                        }
+
+                        if (username.Length > 0) package.Add(new StringContent(username), "username");
+                        if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
+                        if (embeds.Count > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
+
                         HttpResponseMessage response = await APIClient.PostAsync(url, package);
                     }
                 }
@@ -105,23 +104,48 @@ namespace DiscordEmbedBuilder
                 new ArmaJsonConverter()
             });
         }*/
+        private static List<List<string>> ParseStringToList(string input)
+        {
+            input = input.Trim('"');
+            List<List<string>> result = new List<List<string>>();
+
+            if (input.StartsWith("[[") && input.EndsWith("]]"))
+            {
+                // Remove the leading and trailing brackets
+                input = input.Substring(2, input.Length - 4);
+
+                // Split the string by "],["
+                string[] innerLists = input.Split(new string[] { "],[" }, StringSplitOptions.None);
+
+                foreach (string innerList in innerLists)
+                {
+                    // Split each inner list by ","
+                    string[] elements = innerList.Split(',');
+
+                    // Trim the quotes from each element and add to the result list
+                    result.Add(elements.Select(e => e.Trim('"')).ToList());
+                }
+            }
+
+            return result;
+        }
 
         private static List<Types.EmbedData> BuildEmbedList(string input)
         {
-            string Rawdata = input.Trim('[', ']');
-            List<string> embedsData = new List<string>(Rawdata.Split(new string[] { "],[" }, StringSplitOptions.None));
+            List<string> embedsData = ParseStringToList(input);
 
-            var embeds = new List<Types.EmbedData>();
+            // var embeds = new List<Types.EmbedData>();
 
-            foreach (var data in embedsData)
-            {
-                embeds.Add(new EmbedData(new List<string>(data.Split(new string[] { "," }, StringSplitOptions.None))));
-            }
-            
-            Tools.Logger(null, embeds);
+            List<Types.EmbedData> embeds = embedsData.Select(data => new Types.EmbedData(data)).ToList();
+
+            // foreach (var data in embedsData)
+            // {
+            //     embeds.Add(new Types.EmbedData(new List<string>(data.Split(new string[] { "," }, StringSplitOptions.None))));
+            // }
+
+            Tools.Logger(null, embeds.ToString());
 
             return embeds;
-            //string embedsJson = BuildEmbedsJson(embeds);
             /*return new List<Types.EmbedData>() {
                 input.Title,
                 input.Description,
