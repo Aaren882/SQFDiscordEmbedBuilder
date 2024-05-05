@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Maca134.Arma.Serializer;
 using System.Text.RegularExpressions;
 using System.Net;
+using static DiscordEmbedBuilder.Types;
 
 namespace DiscordEmbedBuilder
 {
@@ -54,24 +55,15 @@ namespace DiscordEmbedBuilder
                     }
 
                     // Build embeds array
-                    var embedsData = DeserializeObject<Types.EmbedData>(args[6]);
-                    // List<List<object>> embedList = BuildEmbedList(embedsData);
-                    // List<List<object>> embedsData = args[6];
-
-                    var embeds = new List<Types.EmbedData>();
-                    foreach (var data in embedList)
-                    {
-                        embeds.Add(new Types.EmbedData(data));
-                    }
-
-                    string embedsJson = BuildEmbedsJson(embeds);
+                    var embedsData = DeserializeObject<List<List<object>>>(args[6]);
+                    List<Types.EmbedData> embedList = BuildEmbedList(embedsData);
 
 
                     // if (embedsData.Length > 0) package.Add(new StringContent(embedProperty, Encoding.UTF8), "payload_json");
 
                     // Build embeds array
-                    // Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
-                    // List<Types.EmbedArray> embedList = BuildEmbedList(embeds);
+                    //Types.EmbedData embeds = DeserializeObject<Types.EmbedData>(args[6]);
+                    //List<Types.EmbedData> embedList = BuildEmbedList(embeds);
                     // JArray embedProperty = new JArray();
                     // for (int i = 0; i < 10; i++)
                     // {
@@ -105,7 +97,6 @@ namespace DiscordEmbedBuilder
 
         private static T DeserializeObject<T>(string value)
         {
-            Tools.Logger(null, value);
             value = value.Replace("\"\"", "\\\"\\\"");
             value = new Regex("([[,]?)nil([],]+)").Replace(value, "$1null$2");
             Tools.Logger(null, value);
@@ -113,6 +104,31 @@ namespace DiscordEmbedBuilder
             {
                 new ArmaJsonConverter()
             });
+        }
+
+        private static List<Types.EmbedData> BuildEmbedList(List<List<object>> input)
+        {
+            var embeds = new List<Types.EmbedData>();
+            foreach (var data in input)
+            {
+                Tools.Logger(null, $"{input},{data}");
+
+                embeds.Add(new Types.EmbedData(data));
+            }
+            return embeds;
+            //string embedsJson = BuildEmbedsJson(embeds);
+            /*return new List<Types.EmbedData>() {
+                input.Title,
+                input.Description,
+                input.Color,
+                input.AuthorName,
+                input.AuthorUrl,
+                input.AuthorIconUrl,
+                input.ImageUrl,
+                input.ThumbnailUrl,
+                input.FooterText,
+                input.FooterIconUrl
+            };*/
         }
 
         static string BuildEmbedsJson(List<Types.EmbedData> embeds)
@@ -160,22 +176,6 @@ namespace DiscordEmbedBuilder
                     ""icon_url"": ""{embed.FooterIconUrl}""
                 }}
             }}";
-        }
-
-        private static List<Types.EmbedData> BuildEmbedList(Types.EmbedData input)
-        {
-            return new List<Types.EmbedData>() {
-                input.Title,
-                input.Description,
-                input.Color,
-                input.AuthorName,
-                input.AuthorUrl,
-                input.AuthorIconUrl,
-                input.ImageUrl,
-                input.ThumbnailUrl,
-                input.FooterText,
-                input.FooterIconUrl
-            };
         }
 
         // I don't know the best way to do this, I'm limited by my lack of C# knowledge and how I understand the deserializer to work
