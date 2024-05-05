@@ -72,7 +72,7 @@ namespace DiscordEmbedBuilder
                         //     }
                         // ]
                         // }}", args[6].Trim('"'));
-                        output.Append(args[6].Trim('"'));
+                        output.Append(args[6]);
 
                         Discord.HandleRequest(args);
                     } else {
