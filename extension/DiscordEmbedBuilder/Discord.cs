@@ -98,6 +98,9 @@ namespace DiscordEmbedBuilder
                         // //Tools.Logger(null,package.ToString());
                         // await Tools.LogAsyncReply(response.Content);
 
+                        Tools.Logger(package.ToString());
+                        Tools.Logger(url);
+
                         HttpResponseMessage response = await APIClient.PostAsync(url, package);
                     }
                 }
@@ -122,7 +125,7 @@ namespace DiscordEmbedBuilder
         // The arma array deserializer doesnt like empty strings and I dont know how to fix it, so heres a shit work around
         private static string RemoveReservedString(string input) => input == $"{(char)1}" ? "" : input;
 
-        private static JObject BuildEmbedObject(Types.EmbedArray embed)
+        /*private static JObject BuildEmbedObject(Types.EmbedArray embed)
         {
             JObject embedObject = new JObject();
             Types.EmbedAuthor embedAuthor = embed.author;
@@ -180,7 +183,7 @@ namespace DiscordEmbedBuilder
             if (fieldProperty.Count() > 0) embedObject.Add(new JProperty("fields", fieldProperty));
 
             return embedObject;
-        }
+        }*/
 
         private static JObject BuildFieldObject(Types.EmbedField field)
         {
@@ -196,7 +199,7 @@ namespace DiscordEmbedBuilder
         }
 
         // I don't know the best way to do this, I'm limited by my lack of C# knowledge and how I understand the deserializer to work
-        private static List<Types.EmbedArray> BuildEmbedList(Types.EmbedsArray input)
+        /*private static List<Types.EmbedArray> BuildEmbedList(Types.EmbedsArray input)
         {
             return new List<Types.EmbedArray>() {
                 input.embed1,
@@ -210,7 +213,7 @@ namespace DiscordEmbedBuilder
                 input.embed9,
                 input.embed10
             };
-        }
+        }*/
         private static List<Types.EmbedField> BuildFieldList(Types.EmbedFields input)
         {
             return new List<Types.EmbedField>() {
