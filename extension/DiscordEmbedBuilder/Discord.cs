@@ -31,7 +31,7 @@ namespace DiscordEmbedBuilder
                     string tts = args[4];
 
                     //- File Stream
-                    string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
+                    string filePath = $"{args[5]}".Trim('"',' ').Replace("\"\"", "\"");
 
                     // Discord 2000 character limit
                     if (content.Length > 1999) content = content.Substring(0, 1999);
