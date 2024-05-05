@@ -18,65 +18,80 @@ namespace DiscordEmbedBuilder
     {
         internal static async Task HandleRequest(string[] args)
         {
-                try
+            try
+            {
+                using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
-                // Remove arma quotations
-                string url = args[0].Trim('"').Replace("\"\"", "\"");
-                string content = args[1].Trim('"').Replace("\"\"", "\"");
-                string username = args[2].Trim('"').Replace("\"\"", "\"");
-                string avatar = args[3].Trim('"').Replace("\"\"", "\"");
-                bool tts = Convert.ToBoolean(args[4]);
+                    // Remove arma quotations
+                    string url = args[0].Trim('"').Replace("\"\"", "\"");
+                    string content = args[1].Trim('"').Replace("\"\"", "\"");
+                    string username = args[2].Trim('"').Replace("\"\"", "\"");
+                    string avatar = args[3].Trim('"').Replace("\"\"", "\"");
+                    string tts = args[4];
 
-                //- File Stream
-                string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
+                    //- File Stream
+                    string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
 
-                using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+                    Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
 
-                byte[] fileBytes = new byte[fileStream.Length];
-                await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
-                content.Add(new ByteArrayContent(fileBytes), "file", "file.png");
+                    // Discord 2000 character limit
+                    if (content.Length > 1999) content = content.Substring(0, 1999);
 
-                Types.EmbedsArray embeds = DeserializeObject<Types.EmbedsArray>(args[6]);
+                    // Bare bones
+                    /*JObject package = new JObject(
+                        new JProperty("content", content),
+                        //new JProperty("username", username),
+                        //new JProperty("avatar_url", avatar),
+                        new JProperty("tts", tts)
+                    );*/
 
-                // Discord 2000 character limit
-                if (content.Length > 1999) content = content.Substring(0, 1999);
+                    package.Add(new StringContent(content), "content");
+                    package.Add(new StringContent(tts), "tts");
 
-                // Bare bones
-                JObject package = new JObject(
-                    new JProperty("content", content),
-                    //new JProperty("username", username),
-                    //new JProperty("avatar_url", avatar),
-                    new JProperty("tts", tts)
-                );
+                    //if (username.Length > 0) package.Add(new JProperty("username", username));
+                    //if (avatar.Length > 0) package.Add(new JProperty("avatar_url", avatar));
 
-				if (username.Length > 0) package.Add(new JProperty("username", username));
-				if (avatar.Length > 0) package.Add(new JProperty("avatar_url", avatar));
+                    if (username.Length > 0) package.Add(new StringContent(username), "username");
+                    if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
 
-				// Build embeds array
-				List<Types.EmbedArray> embedList = BuildEmbedList(embeds);
-                JArray embedProperty = new JArray();
-                for (int i = 0; i < 10; i++)
-                {
-                    Types.EmbedArray embed = embedList.ElementAt(i);
-                    if (embed == null) break;
-                    JObject embedObject = BuildEmbedObject(embed);
-                    if (embedObject.Count > 0) embedProperty.Add(embedObject);
-                }
-                if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
+                    if (filePath.Length > 0)
+                    {
+                        using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+                        {
+                            byte[] fileBytes = new byte[fileStream.Length];
+                            await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
+                            // package.Add(new JProperty("file", new ByteArrayContent(fileBytes), "file", "file.png"));
+                            package.Add(new ByteArrayContent(fileBytes), "file", "file.png");
+                        }
+                    }
 
-                // Execute webhook
-                ServicePointManager.Expect100Continue = true;
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 |
-                     SecurityProtocolType.Tls |
-                     SecurityProtocolType.Tls11 |
-                     SecurityProtocolType.Ssl3;
-                using (HttpClient APIClient = new HttpClient())
-                {
-                    APIClient.BaseAddress = new Uri("https://discord.com/api/webhooks/");
-                    APIClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = await APIClient.PostAsync(url, new StringContent(JsonConvert.SerializeObject(package), Encoding.UTF8, "application/json"));
-					//Tools.Logger(null,package.ToString());
-					await Tools.LogAsyncReply(response.Content);
+                    // Build embeds array
+                    List<Types.EmbedArray> embedList = BuildEmbedList(embeds);
+                    JArray embedProperty = new JArray();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Types.EmbedArray embed = embedList.ElementAt(i);
+                        if (embed == null) break;
+                        JObject embedObject = BuildEmbedObject(embed);
+                        if (embedObject.Count > 0) embedProperty.Add(embedObject);
+                    }
+                    //if (embedProperty.Count() > 0) package.Add(new JProperty("embeds", embedProperty));
+                    if (embedProperty.Count() > 0) package.Add(new ByteArrayContent(embedProperty), "embeds");
+
+                    // Execute webhook
+                    ServicePointManager.Expect100Continue = true;
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 |
+                         SecurityProtocolType.Tls |
+                         SecurityProtocolType.Tls11 |
+                         SecurityProtocolType.Ssl3;
+                    using (HttpClient APIClient = new HttpClient())
+                    {
+                        APIClient.BaseAddress = new Uri("https://discord.com/api/webhooks/");
+                        APIClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        HttpResponseMessage response = await APIClient.PostAsync(url, new StringContent(JsonConvert.SerializeObject(package), Encoding.UTF8, "application/json"));
+                        //Tools.Logger(null,package.ToString());
+                        await Tools.LogAsyncReply(response.Content);
+                    }
                 }
             }
             catch (Exception e)

@@ -1,5 +1,8 @@
+using Newtonsoft.Json.Linq;
 using RGiesecke.DllExport;
 using System;
+using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -59,10 +62,21 @@ namespace DiscordEmbedBuilder
             {
                 if (inputKey == SessionKey)
                 {
-                    if (args.Length == 6) // async without await because we don't expect a reply
+                    if (args.Length == 7) // async without await because we don't expect a reply
+                    {
                         Discord.HandleRequest(args);
-                    else
+
+                        string filePath = $"{args[5]}".Trim('"').Replace("\"\"", "\"");
+                        using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+                        {
+                            byte[] fileBytes = new byte[fileStream.Length];
+                            output.Append(new JProperty("file", new ByteArrayContent(fileBytes), "file", "file.png"));
+                            output.Append(fileStream);
+                        }
+                    } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
+                    }
+                        
                 }
                 else
                 {
