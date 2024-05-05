@@ -49,12 +49,13 @@ namespace DiscordEmbedBuilder
                         {
                             byte[] fileBytes = new byte[fileStream.Length];
                             await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
-                            package.Add(new ByteArrayContent(fileBytes), "file", "file.png");
+                            package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
                         }
                     }
 
                     // Build embeds array
                     var embedsData = DeserializeObject<List<List<object>>>(args[6]);
+
                     // List<List<object>> embedList = BuildEmbedList(embedsData);
 
                     var embeds = new List<Types.EmbedData>();
@@ -103,10 +104,7 @@ namespace DiscordEmbedBuilder
             value = value.Replace("\"\"", "\\\"\\\"");
             value = new Regex("([[,]?)nil([],]+)").Replace(value, "$1null$2");
             Tools.Logger(null, value);
-            return JsonConvert.DeserializeObject<T>(value, new JsonConverter[]
-            {
-                new ArmaJsonConverter()
-            });
+            return JObject;
         }
 
         static string BuildEmbedsJson(List<Types.EmbedData> embeds)
