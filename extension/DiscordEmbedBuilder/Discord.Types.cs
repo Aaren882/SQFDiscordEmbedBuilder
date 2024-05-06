@@ -20,7 +20,7 @@ namespace DiscordEmbedBuilder
             public string FooterIconUrl { get; set; }
             public List<FieldData> Fields { get; set; } = new List<FieldData>();
 
-            public string BuildFields()
+            public static string BuildFields()
             {
                 var result = new StringBuilder();
 
