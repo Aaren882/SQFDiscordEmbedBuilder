@@ -64,7 +64,6 @@ namespace DiscordEmbedBuilder
                 {
                     if (args.Length == 8) // async without await because we don't expect a reply
                     {
-                        output.Append(args[7]);
                         Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
