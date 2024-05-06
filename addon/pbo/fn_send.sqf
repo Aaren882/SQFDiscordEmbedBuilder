@@ -30,8 +30,7 @@ private _key = uiNamespace getVariable ["DiscordEmbedBuilder_SessionKey",{""}];
 "DiscordEmbedBuilder" callExtension [call _key,[_webhookurl,_message,_username,_avatar,_tts,_embeds]];
 true
 
-/***************************
-//- Embeds
+/**********Embeds************
 Title -                                        "Title"
 Description -                                  "DESC"
 Color -                                        "000000"
