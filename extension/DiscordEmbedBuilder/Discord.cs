@@ -46,6 +46,7 @@ namespace DiscordEmbedBuilder
                     //- pass Data into "class Types.EmbedData"
                     List<Types.EmbedData> embeds = embedsData.Select(data => new Types.EmbedData(data)).ToList();
 
+                    // Prepare the embeds JSON data
                     string embedsJson = BuildEmbedsJson(embeds);
 
                     // Execute webhook
