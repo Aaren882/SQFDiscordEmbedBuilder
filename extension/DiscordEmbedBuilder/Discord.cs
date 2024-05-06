@@ -115,7 +115,7 @@ namespace DiscordEmbedBuilder
             return result;
         }
 
-        static string BuildEmbedsJson(List<Types.EmbedData> embeds)
+        private static string BuildEmbedsJson(List<Types.EmbedData> embeds)
         {
             var embedsJson = new StringBuilder();
             embedsJson.Append("{ \"embeds\": [");
@@ -137,9 +137,9 @@ namespace DiscordEmbedBuilder
             return embedsJson.ToString();
         }
 
-        static string BuildEmbedJson(Types.EmbedData embed)
+        private static string BuildEmbedJson(Types.EmbedData embed)
         {
-            Tools.Logger(null,embed.BuildFields());
+            Tools.Logger(null,embed);
             return $@"
             {{
                 ""title"": ""{embed.Title}"",
