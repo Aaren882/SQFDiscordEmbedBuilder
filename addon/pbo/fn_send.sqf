@@ -34,7 +34,8 @@ true
 //- Embeds
 Title -                                        "Title"
 Description -                                  "DESC"
-Color -                                        ""
+Color -                                        "000000"
+timestamp -                                    true
 AuthorName -                                   profileName
 AuthorUrl -                                    "https://steamcommunity.com/id/_connor"
 AuthorIconUrl -                                "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/1e/1e3c83b65d6f34cc9708eae853e8bc9848865dd1_full.jpg"
@@ -58,6 +59,7 @@ FooterIconUrl -                                "https://steamcdn-a.opskins.media
 			"Title",
 			"DESC",
 			"14177041",
+			true,
 			profileName,
 			"https://steamcommunity.com/id/_connor",
 			"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/1e/1e3c83b65d6f34cc9708eae853e8bc9848865dd1_full.jpg",
