@@ -37,9 +37,9 @@ namespace DiscordEmbedBuilder
 
                     for (int i = 0; i < embedsData.Count; i++)
                     {
-                        for (int j = 0; j < fieldsData.Count; j++)
+                        for (int j = 0; j < FieldsData.Count; j++)
                         {
-                            embedsData[i].AddRange(fieldsData[j]);
+                            embedsData[i].AddRange(FieldsData[j]);
                         }
                     }
 

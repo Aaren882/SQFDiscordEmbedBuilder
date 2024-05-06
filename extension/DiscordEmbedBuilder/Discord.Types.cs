@@ -1,10 +1,11 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 namespace DiscordEmbedBuilder
 {
     public class Types
     {
-        class EmbedData
+        public class EmbedData
         {
             public string Title { get; set; }
             public string Description { get; set; }
@@ -70,7 +71,7 @@ namespace DiscordEmbedBuilder
             }
         }
 
-        class FieldData
+        public class FieldData
         {
 
             public string name { get; set; }
