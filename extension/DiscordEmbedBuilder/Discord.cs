@@ -122,6 +122,7 @@ namespace DiscordEmbedBuilder
 
             foreach (var embed in embeds)
             {
+                Tools.Logger(null, embed.ToString());
                 embedsJson.Append(BuildEmbedJson(embed));
                 embedsJson.Append(",");
             }
@@ -139,7 +140,6 @@ namespace DiscordEmbedBuilder
 
         private static string BuildEmbedJson(Types.EmbedData embed)
         {
-            Tools.Logger(null,embed.ToString());
             return $@"
             {{
                 ""title"": ""{embed.Title}"",
