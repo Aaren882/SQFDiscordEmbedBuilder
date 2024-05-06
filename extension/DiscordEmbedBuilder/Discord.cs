@@ -33,7 +33,7 @@ namespace DiscordEmbedBuilder
                     // Build embeds array
                     //- Turn Data into List<List<string>> e.g [ ["TITLE","DESC"] , ["11","22] ]
                     List<List<string>> embedsData = ParseStringToList(args[6]);
-                    awiait List<List<string>> FieldsData = ParseStringToList(args[7]);
+                    List<List<string>> FieldsData = ParseStringToList(args[7]);
 
                     for (int i = 0; i < embedsData.Count; i++)
                     {
@@ -122,7 +122,6 @@ namespace DiscordEmbedBuilder
 
             foreach (var embed in embeds)
             {
-                Tools.Logger(null, embed.ToString());
                 embedsJson.Append(BuildEmbedJson(embed));
                 embedsJson.Append(",");
             }
@@ -140,6 +139,8 @@ namespace DiscordEmbedBuilder
 
         private static string BuildEmbedJson(Types.EmbedData embed)
         {
+            Tools.Logger(null, embed.BuildFields());
+
             return $@"
             {{
                 ""title"": ""{embed.Title}"",
