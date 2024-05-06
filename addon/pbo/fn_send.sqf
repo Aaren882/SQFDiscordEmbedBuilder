@@ -68,8 +68,6 @@ FooterIconUrl -                                "https://steamcdn-a.opskins.media
 			"https://steamcdn-a.opskins.media/steamcommunity/public/images/apps/107410/3212af52faf994c558bd622cb0f360c1ef295a6b.jpg"
 		]
 	],
-	[
-		["First Field","First Field Value",true]
-	]
+	[]
  ]
 ]
