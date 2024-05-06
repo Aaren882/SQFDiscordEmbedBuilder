@@ -81,7 +81,7 @@ namespace DiscordEmbedBuilder
                             embeds.Add(new Types.EmbedData(embed));
                         }
 
-                        output.Append(embeds[0].Fields.Count);
+                        output.Append(embeds.Count);
                         Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
