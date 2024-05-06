@@ -25,14 +25,14 @@ namespace DiscordEmbedBuilder
                 Color = data.Count > 2 ? (string)data[2] : "14177041";
                 timestamp = (data[3].ToLower() == "true") ? DateTime.UtcNow.ToString("s") : "";
 
-                AuthorName = data.Count > 3 ? (string)data[3] : "";
-                AuthorUrl = data.Count > 4 ? (string)data[4] : "";
-                AuthorIconUrl = data.Count > 5 ? (string)data[5] : "";
+                AuthorName = data.Count > 4 ? (string)data[4] : "";
+                AuthorUrl = data.Count > 5 ? (string)data[5] : "";
+                AuthorIconUrl = data.Count > 6 ? (string)data[6] : "";
 
-                ImageUrl = data.Count > 6 ? (string)data[6] : "";
-                ThumbnailUrl = data.Count > 7 ? (string)data[7] : "";
-                FooterText = data.Count > 8 ? (string)data[8] : "";
-                FooterIconUrl = data.Count > 9 ? (string)data[9] : "";
+                ImageUrl = data.Count > 7 ? (string)data[7] : "";
+                ThumbnailUrl = data.Count > 8 ? (string)data[8] : "";
+                FooterText = data.Count > 9 ? (string)data[9] : "";
+                FooterIconUrl = data.Count > 10 ? (string)data[10] : "";
             }
         }
     }
