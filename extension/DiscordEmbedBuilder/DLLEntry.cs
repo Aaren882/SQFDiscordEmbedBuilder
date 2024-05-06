@@ -66,6 +66,7 @@ namespace DiscordEmbedBuilder
 
                         List<List<string>> embedsData = ParseStringToList(args[6]);
                         List<List<string>> FieldsData = ParseStringToList(args[7].Replace("[[]]", ""));
+                        List<Types.EmbedData> embeds = new List<Types.EmbedData>();
 
                         foreach (var embed in embedsData)
                         {
@@ -77,8 +78,8 @@ namespace DiscordEmbedBuilder
                                     Tools.Logger(null, field_Var);
                                 }
                             }
+                            embeds.Add(new Types.EmbedData(embed));
                         }
-                        List<Types.EmbedData> embeds = embedsData.Select(data => new Types.EmbedData(data)).ToList();
 
                         output.Append(embeds[0].Fields.Count);
                         Discord.HandleRequest(args);
