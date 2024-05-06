@@ -42,10 +42,10 @@ namespace DiscordEmbedBuilder
                 Description = data.Count > 1 ? (string)data[1] : "";
                 Color = data.Count > 2 ? (string)data[2] : "14177041";
 
-                if (data.Count > 3) {
-                    timestamp = data[3].ToLower() == "true" ? (string)DateTime.UtcNow.ToString("s") : "";
+                if (data.Count > 2) {
+                    Color = data[2] != "" ? "" : "14177041";
                 } else {
-                    timestamp = "";
+                    Color = "14177041";
                 }
 
                 AuthorName = data.Count > 4 ? (string)data[4] : "";
