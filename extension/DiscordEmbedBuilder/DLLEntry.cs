@@ -62,7 +62,7 @@ namespace DiscordEmbedBuilder
             {
                 if (inputKey == SessionKey)
                 {
-                    if (args.Length == 7) // async without await because we don't expect a reply
+                    if (args.Length == 8) // async without await because we don't expect a reply
                     {
                         Discord.HandleRequest(args);
                     } else {
