@@ -72,12 +72,15 @@ namespace DiscordEmbedBuilder
                             foreach (var field in FieldsData)
                             {
                                 embed.AddRange(field);
-                                Tools.Logger(null, field[0]);
+                                foreach (var field_Var in field)
+                                {
+                                    Tools.Logger(null, field_Var);
+                                }
                             }
                         }
                         List<Types.EmbedData> embeds = embedsData.Select(data => new Types.EmbedData(data)).ToList();
 
-                        output.Append(embeds[0].Fields[0]);
+                        output.Append(embeds[0].Fields.Count);
                         Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
