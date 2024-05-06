@@ -1,9 +1,8 @@
-using Newtonsoft.Json.Linq;
 using RGiesecke.DllExport;
 using System;
-using System.IO;
-using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DiscordEmbedBuilder
@@ -73,10 +72,11 @@ namespace DiscordEmbedBuilder
                             foreach (var field in FieldsData)
                             {
                                 embed.AddRange(field);
+                                Tools.Logger(null, field.ToString());
                             }
                         }
 
-                        output.Append(embed.ToString());
+                        output.Append(embedsData.ToString());
                         Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
