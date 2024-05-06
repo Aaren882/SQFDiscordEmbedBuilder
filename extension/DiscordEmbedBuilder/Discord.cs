@@ -73,6 +73,7 @@ namespace DiscordEmbedBuilder
             }
         }
         
+        //- Translating Data
         private static List<List<string>> ParseStringToList(string input)
         {
             input = input.Trim('"');
@@ -101,18 +102,14 @@ namespace DiscordEmbedBuilder
 
         private static List<Types.EmbedData> BuildEmbedList(string input)
         {
+            //- Turn Data into List<List<string>> e.g [ ["TITLE","DESC"] , ["11","22] ]
             List<List<string>> embedsData = ParseStringToList(input);
 
-            // var embeds = new List<Types.EmbedData>();
-
+            //- pass Data into "class Types.EmbedData"
             List<Types.EmbedData> embeds = embedsData.Select(data => new Types.EmbedData(data)).ToList();
 
-            // foreach (var data in embedsData)
-            // {
-            //     embeds.Add(new Types.EmbedData(new List<string>(data.Split(new string[] { "," }, StringSplitOptions.None))));
-            // }
-
-            Tools.Logger(null, embeds.ToString());
+            //- Logs
+            // Tools.Logger(null, embeds.ToString());
 
             return embeds;
         }
@@ -148,7 +145,7 @@ namespace DiscordEmbedBuilder
                 ""color"": ""{embed.Color}"",
                 ""author"": {{
                     ""name"": ""{embed.AuthorName}"",
-                    ""url"": ""{embed.tts}"",
+                    ""url"": ""{embed.AuthorUrl}"",
                     ""icon_url"": ""{embed.AuthorIconUrl}""
                 }},
                 ""image"": {{

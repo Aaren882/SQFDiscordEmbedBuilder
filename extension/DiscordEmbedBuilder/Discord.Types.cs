@@ -9,7 +9,7 @@ namespace DiscordEmbedBuilder
             public string Description { get; set; }
             public string Color { get; set; }
             public string AuthorName { get; set; }
-            public string tts { get; set; }
+            public string AuthorUrl { get; set; }
             public string AuthorIconUrl { get; set; }
             public string ImageUrl { get; set; }
             public string ThumbnailUrl { get; set; }
@@ -23,8 +23,9 @@ namespace DiscordEmbedBuilder
                 Color = data.Count > 2 ? (string)data[2] : "14177041";
 
                 AuthorName = data.Count > 3 ? (string)data[3] : "";
-                tts = data.Count > 4 ? (string)data[4] : "";
+                AuthorUrl = data.Count > 4 ? (string)data[4] : "";
                 AuthorIconUrl = data.Count > 5 ? (string)data[5] : "";
+                
                 ImageUrl = data.Count > 6 ? (string)data[6] : "";
                 ThumbnailUrl = data.Count > 7 ? (string)data[7] : "";
                 FooterText = data.Count > 8 ? (string)data[8] : "";
