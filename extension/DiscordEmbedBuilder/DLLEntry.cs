@@ -64,7 +64,19 @@ namespace DiscordEmbedBuilder
                 {
                     if (args.Length == 8) // async without await because we don't expect a reply
                     {
-                        output.Append(args[7]);
+
+                        List<List<string>> embedsData = ParseStringToList(args[6]);
+                        List<List<string>> FieldsData = ParseStringToList(args[7].Replace("[[]]", ""));
+
+                        foreach (var embed in embedsData)
+                        {
+                            foreach (var field in FieldsData)
+                            {
+                                embed.AddRange(field);
+                            }
+                        }
+
+                        output.Append(embed.ToString());
                         Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
@@ -82,6 +94,31 @@ namespace DiscordEmbedBuilder
                 Tools.Logger(e);
             };
             return 1;
+        }
+        private static List<List<string>> ParseStringToList(string input)
+        {
+            input = input.Trim('"');
+            List<List<string>> result = new List<List<string>>();
+
+            if (input.StartsWith("[[") && input.EndsWith("]]"))
+            {
+                // Remove the leading and trailing brackets
+                input = input.Substring(2, input.Length - 4);
+
+                // Split the string by "],["
+                string[] innerLists = input.Split(new string[] { "],[" }, StringSplitOptions.None);
+
+                foreach (string innerList in innerLists)
+                {
+                    // Split each inner list by ","
+                    string[] elements = innerList.Split(',');
+
+                    // Trim the quotes from each element and add to the result list
+                    result.Add(elements.Select(e => e.Trim('"')).ToList());
+                }
+            }
+
+            return result;
         }
     }
 }
