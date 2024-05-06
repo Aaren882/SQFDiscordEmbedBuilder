@@ -9,7 +9,7 @@ using System.Net;
 
 namespace DiscordEmbedBuilder
 {
-    internal class Discord
+    internal static class Discord
     {
         internal static async Task HandleRequest(string[] args)
         {
