@@ -18,9 +18,9 @@ namespace DiscordEmbedBuilder
             public string ThumbnailUrl { get; set; }
             public string FooterText { get; set; }
             public string FooterIconUrl { get; set; }
-            public List<FieldData> Fields { get; set; } = new List<FieldData>();
+            public List<Types.FieldData> Fields { get; set; } = new List<Types.FieldData>();
 
-            public static string BuildFields()
+            public string BuildFields()
             {
                 var result = new StringBuilder();
 
@@ -65,7 +65,7 @@ namespace DiscordEmbedBuilder
                         {
                             FieldStrings.Add(data[i + j]);
                         }
-                        Fields.Add(new FieldData(FieldStrings));
+                        Fields.Add(new Types.FieldData(FieldStrings));
                     }
                 }
             }
@@ -85,7 +85,7 @@ namespace DiscordEmbedBuilder
 
                 if (data.Count > 2)
                 {
-                    inline = data[2].ToLower() == "true" ? "true" : "false";
+                    inline = data[2].ToLower() == "true" ? "true" : "";
                 }
                 else
                 {
