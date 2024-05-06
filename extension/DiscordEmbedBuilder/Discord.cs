@@ -31,7 +31,21 @@ namespace DiscordEmbedBuilder
                     if (content.Length > 1999) content = content.Substring(0, 1999);
 
                     // Build embeds array
-                    List<Types.EmbedData> embeds = BuildEmbedList(args[6]);
+                    //- Turn Data into List<List<string>> e.g [ ["TITLE","DESC"] , ["11","22] ]
+                    List<List<string>> embedsData = ParseStringToList(args[6]);
+                    List<List<string>> FieldsData = ParseStringToList(args[7]);
+
+                    for (int i = 0; i < embedsData.Count; i++)
+                    {
+                        for (int j = 0; j < fieldsData.Count; j++)
+                        {
+                            embedsData[i].AddRange(fieldsData[j]);
+                        }
+                    }
+
+                    //- pass Data into "class Types.EmbedData"
+                    List<Types.EmbedData> embeds = embedsData.Select(data => new Types.EmbedData(data)).ToList();
+
                     string embedsJson = BuildEmbedsJson(embeds);
 
                     // Execute webhook
@@ -100,20 +114,6 @@ namespace DiscordEmbedBuilder
             return result;
         }
 
-        private static List<Types.EmbedData> BuildEmbedList(string input)
-        {
-            //- Turn Data into List<List<string>> e.g [ ["TITLE","DESC"] , ["11","22] ]
-            List<List<string>> embedsData = ParseStringToList(input);
-
-            //- pass Data into "class Types.EmbedData"
-            List<Types.EmbedData> embeds = embedsData.Select(data => new Types.EmbedData(data)).ToList();
-
-            //- Logs
-            // Tools.Logger(null, embeds.ToString());
-
-            return embeds;
-        }
-
         static string BuildEmbedsJson(List<Types.EmbedData> embeds)
         {
             var embedsJson = new StringBuilder();
@@ -145,20 +145,21 @@ namespace DiscordEmbedBuilder
                 ""color"": ""{embed.Color}"",
                 ""timestamp"": ""{embed.timestamp}"",
                 ""author"": {{
-                    ""name"": ""{embed.AuthorName}"",
-                    ""url"": ""{embed.AuthorUrl}"",
-                    ""icon_url"": ""{embed.AuthorIconUrl}""
+                ""name"": ""{embed.AuthorName}"",
+                ""url"": ""{embed.AuthorUrl}"",
+                ""icon_url"": ""{embed.AuthorIconUrl}""
                 }},
                 ""image"": {{
-                    ""url"": ""{embed.ImageUrl}""
+                ""url"": ""{embed.ImageUrl}""
                 }},
                 ""thumbnail"": {{
-                    ""url"": ""{embed.ThumbnailUrl}""
+                ""url"": ""{embed.ThumbnailUrl}""
                 }},
                 ""footer"": {{
-                    ""text"": ""{embed.FooterText}"",
-                    ""icon_url"": ""{embed.FooterIconUrl}""
-                }}
+                ""text"": ""{embed.FooterText}"",
+                ""icon_url"": ""{embed.FooterIconUrl}""
+                }},
+                ""fields"": [{embed.BuildFields()}]
             }}";
         }
     }
