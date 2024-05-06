@@ -143,6 +143,7 @@ namespace DiscordEmbedBuilder
                 ""title"": ""{embed.Title}"",
                 ""description"": ""{embed.Description}"",
                 ""color"": ""{embed.Color}"",
+                ""timestamp"": ""{embed.timestamp}"",
                 ""author"": {{
                     ""name"": ""{embed.AuthorName}"",
                     ""url"": ""{embed.AuthorUrl}"",
