@@ -78,10 +78,12 @@ namespace DiscordEmbedBuilder
                                     Tools.Logger(null, field_Var);
                                 }
                             }
+                            Tools.Logger(null, embed);
+                            Tools.Logger(null, embed.count);
                             embeds.Add(new Types.EmbedData(embed));
                         }
 
-                        output.Append(embeds.Count);
+                        output.Append(embeds[0].Fields.Count);
                         Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
