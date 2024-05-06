@@ -84,13 +84,9 @@ namespace DiscordEmbedBuilder
                 value = data.Count > 1 ? (string)data[1] : "";
 
                 if (data.Count > 2)
-                {
                     inline = data[2].ToLower() == "true" ? "true" : "";
-                }
                 else
-                {
                     inline = "";
-                }
             }
         }
     }
