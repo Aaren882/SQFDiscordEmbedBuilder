@@ -63,27 +63,6 @@ namespace DiscordEmbedBuilder
                 {
                     if (args.Length == 8) // async without await because we don't expect a reply
                     {
-
-                        List<List<string>> embedsData = ParseStringToList(args[6]);
-                        List<List<string>> FieldsData = ParseStringToList(args[7].Replace("[[]]", ""));
-                        List<Types.EmbedData> embeds = new List<Types.EmbedData>();
-
-                        foreach (var embed in embedsData)
-                        {
-                            foreach (var field in FieldsData)
-                            {
-                                embed.AddRange(field);
-                                foreach (var field_Var in field)
-                                {
-                                    Tools.Logger(null, field_Var);
-                                }
-                            }
-                            Tools.Logger(null, embed);
-                            Tools.Logger(null, embed.count);
-                            embeds.Add(new Types.EmbedData(embed));
-                        }
-
-                        output.Append(embeds[0].Fields.Count);
                         Discord.HandleRequest(args);
                     } else {
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
