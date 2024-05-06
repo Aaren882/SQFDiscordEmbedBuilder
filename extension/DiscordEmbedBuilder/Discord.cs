@@ -33,13 +33,13 @@ namespace DiscordEmbedBuilder
                     // Build embeds array
                     //- Turn Data into List<List<string>> e.g [ ["TITLE","DESC"] , ["11","22] ]
                     List<List<string>> embedsData = ParseStringToList(args[6]);
-                    List<List<string>> FieldsData = ParseStringToList(args[7]);
+                    List<List<string>> FieldsData = ParseStringToList(args[7].Replace("[[]]", ""));
 
-                    for (int i = 0; i < embedsData.Count; i++)
+                    foreach (var embed in embedsData)
                     {
-                        for (int j = 0; j < FieldsData.Count; j++)
+                        foreach (var field in FieldsData)
                         {
-                            embedsData[i].AddRange(FieldsData[j]);
+                            embed.AddRange(field);
                         }
                     }
 
