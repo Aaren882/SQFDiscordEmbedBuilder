@@ -71,12 +71,11 @@ namespace DiscordEmbedBuilder
                         {
                             foreach (var field in FieldsData)
                             {
-                                embed.AddRange(field[0]);
-                                Tools.Logger(null, field.ToString());
+                                embed.AddRange(field);
+                                Tools.Logger(null, field[0]);
                             }
                         }
                         List<Types.EmbedData> embeds = embedsData.Select(data => new Types.EmbedData(data)).ToList();
-
 
                         output.Append(embeds[0].Fields[0]);
                         Discord.HandleRequest(args);
