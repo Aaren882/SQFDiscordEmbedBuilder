@@ -139,8 +139,6 @@ namespace DiscordEmbedBuilder
 
         private static string BuildEmbedJson(Types.EmbedData embed)
         {
-            Tools.Logger(null, embed.BuildFields());
-
             return $@"
             {{
                 ""title"": ""{embed.Title}"",
