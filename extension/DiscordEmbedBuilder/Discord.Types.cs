@@ -32,7 +32,6 @@ namespace DiscordEmbedBuilder
                         ""inline"": ""{Field.inline}""
                     }},");
                 }
-                Tools.Logger(null, result.ToString().Trim(','));
 
                 return result.ToString().Trim(',');
             }
