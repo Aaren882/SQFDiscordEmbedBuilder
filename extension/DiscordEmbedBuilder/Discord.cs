@@ -112,6 +112,8 @@ namespace DiscordEmbedBuilder
                 }
             }
 
+            Tools.Logger(null,result);
+
             return result;
         }
 
