@@ -1,0 +1,13 @@
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\bin\Release\net8.0\DiscordMessageAPI.dll.config
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\bin\Release\net8.0\DiscordMessageAPI.deps.json
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\bin\Release\net8.0\DiscordMessageAPI.dll
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\bin\Release\net8.0\DiscordMessageAPI.pdb
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\DiscordMessageAPI.csproj.AssemblyReference.cache
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\DiscordMessageAPI.GeneratedMSBuildEditorConfig.editorconfig
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\DiscordMessageAPI.csproj.CoreCompileInputs.cache
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\DiscordMessageAPI.sourcelink.json
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\DiscordMessageAPI.csproj.Fody.CopyLocal.cache
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\DiscordMessageAPI.dll
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\refint\DiscordMessageAPI.dll
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\DiscordMessageAPI.pdb
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\Release\net8.0\ref\DiscordMessageAPI.dll
