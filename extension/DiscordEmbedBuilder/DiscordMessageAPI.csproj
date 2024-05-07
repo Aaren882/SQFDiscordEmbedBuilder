@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DiscordMessageAPI</RootNamespace>
     <AssemblyName>DiscordMessageAPI</AssemblyName>
-    <TargetFrameworkVersion>v8.0.4</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
