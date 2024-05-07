@@ -1,9 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace DiscordMessageAPI
 {
@@ -102,7 +104,7 @@ namespace DiscordMessageAPI
         }
 
         //- Translating Data
-        static List<List<string>> ParseStringToList(string input)
+        private static List<List<string>> ParseStringToList(string input)
         {
             List<List<string>> result = new List<List<string>>();
 
