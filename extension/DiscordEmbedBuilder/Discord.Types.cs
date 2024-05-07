@@ -48,6 +48,12 @@ namespace DiscordEmbedBuilder
                     Color = "14177041";
                 }
 
+                if (data.Count > 3) {
+                    timestamp = data[3].ToLower() == "true" ? (string)DateTime.Now.ToString("s") : "";
+                } else {
+                    timestamp = "";
+                }
+
                 AuthorName = data.Count > 4 ? (string)data[4] : "";
                 AuthorUrl = data.Count > 5 ? (string)data[5] : "";
                 AuthorIconUrl = data.Count > 6 ? (string)data[6] : "";

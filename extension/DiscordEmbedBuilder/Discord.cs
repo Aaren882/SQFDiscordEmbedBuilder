@@ -104,26 +104,28 @@ namespace DiscordEmbedBuilder
         }
 
         //- Translating Data
-        private static List<List<string>> ParseStringToList(string input)
+        static List<List<string>> ParseStringToList(string input)
         {
-            input = input.Trim('"');
             List<List<string>> result = new List<List<string>>();
 
             if (input.StartsWith("[[") && input.EndsWith("]]"))
             {
-                // Remove the leading and trailing brackets
                 input = input.Substring(2, input.Length - 4);
 
-                // Split the string by "],["
                 string[] innerLists = input.Split(new string[] { "],[" }, StringSplitOptions.None);
 
                 foreach (string innerList in innerLists)
                 {
-                    // Split each inner list by ","
                     string[] elements = innerList.Split(',');
+                    List<string> innerResult = new List<string>();
 
-                    // Trim the quotes from each element and add to the result list
-                    result.Add(elements.Select(e => e.Trim('"')).ToList());
+                    foreach (string element in elements)
+                    {
+                        // Convert each element to string and add to the inner list
+                        innerResult.Add(element.Trim('"', '[', ']'));
+                    }
+
+                    result.Add(innerResult);
                 }
             }
 
