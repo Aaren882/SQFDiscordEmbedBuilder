@@ -104,7 +104,7 @@ namespace DiscordMessageAPI
         }
 
         //- Translating Data
-        static List<List<string>> ParseStringToList(string input)
+        private static List<List<string>> ParseStringToList(string input)
         {
             List<List<string>> result = new List<List<string>>();
 
