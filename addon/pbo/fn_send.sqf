@@ -44,7 +44,7 @@ FooterText -                                   "This is the footer text"
 FooterIconUrl -                                "https://steamcdn-a.opskins.media/steamcommunity/public/images/apps/107410/3212af52faf994c558bd622cb0f360c1ef295a6b.jpg"
 ***************************/
 
-"DiscordEmbedBuilder" callExtension [
+"DiscordMessageAPI" callExtension [
  call DiscordEmbedBuilder_SessionKey,
  [
   "https://discord.com/api/webhooks/1236040735065767936/9fJ6Joxk6zAZ5d8WNTNh3RTpnWVV1PlVMJYJNlua3cpCTnJj6x2YsSMNWTcBZeLE12XO",

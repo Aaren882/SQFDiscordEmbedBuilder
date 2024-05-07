@@ -1,0 +1,8 @@
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\x64\Release\DiscordEmbedBuilder.csproj.AssemblyReference.cache
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\x64\Release\DiscordEmbedBuilder.csproj.CoreCompileInputs.cache
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\bin\x64\Release\DiscordEmbedBuilder.dll.config
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\bin\x64\Release\DiscordEmbedBuilder.dll
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\bin\x64\Release\DiscordEmbedBuilder.pdb
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\x64\Release\DiscordEmbedBuilder.csproj.Fody.CopyLocal.cache
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\x64\Release\DiscordEmbedBuilder.dll
+P:\Arma_Webhook\extension\DiscordEmbedBuilder\obj\x64\Release\DiscordEmbedBuilder.pdb
