@@ -1,0 +1,91 @@
+{
+  "format": 1,
+  "restore": {
+    "P:\\Arma_Webhook\\extension\\DiscordEmbedBuilder\\DiscordEmbedBuilder.csproj": {}
+  },
+  "projects": {
+    "P:\\Arma_Webhook\\extension\\DiscordEmbedBuilder\\DiscordEmbedBuilder.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "P:\\Arma_Webhook\\extension\\DiscordEmbedBuilder\\DiscordEmbedBuilder.csproj",
+        "projectName": "DiscordEmbedBuilder",
+        "projectPath": "P:\\Arma_Webhook\\extension\\DiscordEmbedBuilder\\DiscordEmbedBuilder.csproj",
+        "packagesPath": "C:\\Users\\aaren\\.nuget\\packages\\",
+        "outputPath": "P:\\Arma_Webhook\\extension\\DiscordEmbedBuilder\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\aaren\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net481"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net481": {
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net481": {
+          "dependencies": {
+            "Costura.Fody": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[5.7.0, )"
+            },
+            "Maca134.Arma.Serializer": {
+              "target": "Package",
+              "version": "[0.0.0.8, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.2, )"
+            },
+            "System.Diagnostics.DiagnosticSource": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "System.Net.Http": {
+              "target": "Package",
+              "version": "[4.3.4, )"
+            },
+            "System.Text.RegularExpressions": {
+              "target": "Package",
+              "version": "[4.3.1, )"
+            },
+            "UnmanagedExports.Repack.Upgrade": {
+              "target": "Package",
+              "version": "[1.2.1, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-arm64": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-namespace DiscordEmbedBuilder
+namespace DiscordMessageAPI
 {
     public class Types
     {
@@ -46,6 +46,12 @@ namespace DiscordEmbedBuilder
                     Color = data[2] != "" ? "" : "14177041";
                 } else {
                     Color = "14177041";
+                }
+
+                if (data.Count > 3) {
+                    timestamp = data[3].ToLower() == "true" ? (string)DateTime.Now.ToString("s") : "";
+                } else {
+                    timestamp = "";
                 }
 
                 AuthorName = data.Count > 4 ? (string)data[4] : "";

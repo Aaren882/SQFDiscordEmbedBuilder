@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DiscordEmbedBuilder
+namespace DiscordMessageAPI
 {
     public class DllEntry
     {
@@ -62,11 +62,9 @@ namespace DiscordEmbedBuilder
                 if (inputKey == SessionKey)
                 {
                     if (args.Length == 8) // async without await because we don't expect a reply
-                    {
                         Discord.HandleRequest(args);
-                    } else {
+                    else
                         output.Append("INCORRECT NUMBER OF ARGUMENTS");
-                    }
                         
                 }
                 else
