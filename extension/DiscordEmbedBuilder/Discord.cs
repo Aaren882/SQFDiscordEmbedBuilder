@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 
-namespace DiscordEmbedBuilder
+namespace DiscordMessageAPI
 {
     internal static class Discord
     {
