@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-namespace DiscordEmbedBuilder
+namespace DiscordMessageAPI
 {
     public class Types
     {

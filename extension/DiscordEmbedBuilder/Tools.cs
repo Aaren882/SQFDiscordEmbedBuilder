@@ -4,14 +4,14 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace DiscordEmbedBuilder
+namespace DiscordMessageAPI
 {
     internal class Tools
     {
         private static readonly string AssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        private static readonly string ExtFilePath = Path.Combine(AssemblyPath, "DiscordEmbedBuilder");
+        private static readonly string ExtFilePath = Path.Combine(AssemblyPath, "DiscordMessageAPI");
         private static readonly string LogFilePath = Path.Combine(ExtFilePath, "logs");
-        private static readonly string LogFileName = Path.Combine(LogFilePath, $"{DateTime.Now.ToString("yyyy-MM-dd.HH-mm-ss")}.DiscordEmbedBuilder.log");
+        private static readonly string LogFileName = Path.Combine(LogFilePath, $"{DateTime.Now.ToString("yyyy-MM-dd.HH-mm-ss")}.DiscordMessageAPI.log");
 
         internal static void Logger(Exception e = null, string s = "", bool loop = false)
         {
