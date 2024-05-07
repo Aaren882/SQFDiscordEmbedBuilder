@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\extension"
+    "\\extension",
+    "\\extension\\DiscordMessageAPI"
   ],
   "SelectedNode": "\\extension\\DiscordMessageAPI.sln",
   "PreviewInSolutionExplorer": false
