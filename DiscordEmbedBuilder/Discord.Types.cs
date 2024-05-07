@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-namespace DiscordEmbedBuilder
+namespace DiscordMessageAPI
 {
     public class Types
     {
@@ -42,8 +42,14 @@ namespace DiscordEmbedBuilder
                 Description = data.Count > 1 ? (string)data[1] : "";
                 Color = data.Count > 2 ? (string)data[2] : "14177041";
 
+                if (data.Count > 2) {
+                    Color = data[2] != "" ? "" : "14177041";
+                } else {
+                    Color = "14177041";
+                }
+
                 if (data.Count > 3) {
-                    timestamp = data[3].ToLower() == "true" ? (string)DateTime.UtcNow.ToString("s") : "";
+                    timestamp = data[3].ToLower() == "true" ? (string)DateTime.Now.ToString("s") : "";
                 } else {
                     timestamp = "";
                 }
@@ -84,9 +90,9 @@ namespace DiscordEmbedBuilder
                 value = data.Count > 1 ? (string)data[1] : "";
 
                 if (data.Count > 2)
-                    inline = data[2].ToLower() == "true" ? "true" : "";
+                    inline = data[2].ToLower() == "true" ? "true" : "false";
                 else
-                    inline = "";
+                    inline = "false";
             }
         }
     }
