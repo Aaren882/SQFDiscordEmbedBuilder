@@ -1,17 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿ <?xml version="1.0" encoding="utf-8"?>
+  <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C71A1E67-9C19-493D-A69E-04A1AA18BE19}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
-    <AssemblyTitle>DiscordMessageAPI</AssemblyTitle>
-    <Product>DiscordMessageAPI</Product>
-    <Copyright>Copyright ©  2022</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <PlatformTarget>x64</PlatformTarget>
-    <SignAssembly>False</SignAssembly>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DiscordMessageAPI</RootNamespace>
+    <AssemblyName>DiscordMessageAPI</AssemblyName>
+    <TargetFrameworkVersion>net8.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
