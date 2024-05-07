@@ -5,6 +5,11 @@
       "taskLabel": "\u5DE5\u4F5C-DiscordMessageAPI",
       "appliesTo": "extension/DiscordMessageAPI.sln",
       "type": "launch"
+    },
+    {
+      "taskLabel": "\u5DE5\u4F5C-DiscordMessageAPI",
+      "appliesTo": "extension/DiscordMessageAPI.sln",
+      "type": "launch"
     }
   ]
 }
