@@ -45,7 +45,7 @@ namespace DiscordMessageAPI
             return id;
         }
 
-        internal static async Task LogAsyncReply(HttpContent responseContent)
+        /*internal static async Task LogAsyncReply(HttpContent responseContent)
         {
             string readResponse = "";
             using (var reader = new StreamReader(await responseContent.ReadAsStreamAsync()))
@@ -53,6 +53,6 @@ namespace DiscordMessageAPI
                 readResponse += await reader.ReadToEndAsync();
             }
             if (readResponse.Length > 0) Logger(null, $"AsyncRet: {readResponse}");
-        }
+        }*/
     }
 }
