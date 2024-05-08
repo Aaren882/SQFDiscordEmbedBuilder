@@ -49,7 +49,7 @@ namespace DiscordMessageAPI
                 }
 
                 if (data.Count > 3) {
-                    timestamp = data[3].ToLower() == "true" ? (string)DateTime.Now.ToString("s") : "";
+                    timestamp = data[3].ToLower() == "true" ? DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : "";
                 } else {
                     timestamp = "";
                 }
