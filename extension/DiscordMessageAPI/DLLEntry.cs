@@ -1,8 +1,6 @@
 using RGiesecke.DllExport;
 using System;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace DiscordMessageAPI
@@ -78,31 +76,6 @@ namespace DiscordMessageAPI
                 Tools.Logger(e);
             };
             return 1;
-        }
-        private static List<List<string>> ParseStringToList(string input)
-        {
-            input = input.Trim('"');
-            List<List<string>> result = new List<List<string>>();
-
-            if (input.StartsWith("[[") && input.EndsWith("]]"))
-            {
-                // Remove the leading and trailing brackets
-                input = input.Substring(2, input.Length - 4);
-
-                // Split the string by "],["
-                string[] innerLists = input.Split(new string[] { "],[" }, StringSplitOptions.None);
-
-                foreach (string innerList in innerLists)
-                {
-                    // Split each inner list by ","
-                    string[] elements = innerList.Split(',');
-
-                    // Trim the quotes from each element and add to the result list
-                    result.Add(elements.Select(e => e.Trim('"')).ToList());
-                }
-            }
-
-            return result;
         }
     }
 }
