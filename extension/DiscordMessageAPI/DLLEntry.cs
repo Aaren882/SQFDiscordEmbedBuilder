@@ -2,8 +2,6 @@ using RGiesecke.DllExport;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.IO;
-using System.Text.Json;
 
 namespace DiscordMessageAPI
 {
@@ -39,9 +37,7 @@ namespace DiscordMessageAPI
                 {
                     InitComplete = true;
                     //Tools.Logger(null, "Initialized");
-                    string jsonString = File.ReadAllText($@"{Tools.AssemblyPath}\Webhooks.json");
-                    Webhooks_Storage MessageJSON = JsonSerializer.Deserialize<Webhooks_Storage>(jsonString);
-                    Tools.Logger(null, "Attempted re-initialization");
+                    
                     output.Append(SessionKey);
                 }
                 else
