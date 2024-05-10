@@ -10,16 +10,24 @@ using System.Net;
 
 namespace DiscordMessageAPI
 {
-    internal static class Discord
+    static class Discord
     {
+        private static Webhooks_Storage ALLWebhooks = null;
+
         internal static async Task HandleRequest(string[] args)
         {
+            //- only on init
+            if (null == ALLWebhooks)
+            {
+                string jsonString = File.ReadAllText($@"{Tools.AssemblyPath}\Webhooks.json");
+                ALLWebhooks = JsonSerializer.Deserialize<Webhooks_Storage>(jsonString);
+            }
             try
             {
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
                     // Remove arma quotations
-                    string url = args[0].Trim('"',' ').Replace("\"\"", "\"");
+                    string url = ALLWebhooks.webhooks[0];
                     string content = args[1].Trim('"',' ').Replace("\"\"", "\"");
                     string username = args[2].Trim('"',' ').Replace("\"\"", "\"");
                     string avatar = args[3].Trim('"',' ').Replace("\"\"", "\"");
