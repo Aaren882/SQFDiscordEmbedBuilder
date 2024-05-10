@@ -96,4 +96,52 @@ namespace DiscordMessageAPI
             }
         }
     }
+    public class Webhooks_Storage
+    {
+        public string[]? webhooks { get; set; }
+    }
+    public class JSON_MessageTypes
+    {
+        class JSON_Message
+        {
+            public string? username { get; set; }
+            public string? avatar_url { get; set; }
+            public string? content { get; set; }
+            public List<Embeds>? embeds { get; set; }
+        };
+
+        class Embeds
+        {
+            public author? author { get; set; }
+            public string? title { get; set; }
+            public string? url { get; set; }
+            public string? description { get; set; }
+            public int? color { get; set; }
+            public List<Field>? fields { get; set; }
+            public thumbnail? thumbnail { get; set; }
+            public image? image { get; set; }
+            public footer? footer { get; set; }
+        }
+        class Field
+        {
+            public string? name { get; set; }
+            public string? value { get; set; }
+            public bool? inline { get; set; }
+        }
+        class image
+        {
+            public string? url { get; set; }
+        }
+        class thumbnail : image { }
+        class author : image
+        {
+            public string? name { get; set; }
+            public string? icon_url { get; set; }
+        }
+        class footer
+        {
+            public string? text { get; set; }
+            public string? icon_url { get; set; }
+        }
+    }
 }
