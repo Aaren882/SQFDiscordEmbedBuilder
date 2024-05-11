@@ -16,20 +16,17 @@ namespace DiscordMessageAPI
 
         internal static async Task HandleRequest(string[] args)
         {
-            try
-            {
-                int webhook_sel = Int32.Parse(args[0]);
-            }
-            catch (FormatException)
-            {
-                Tools.Logger($"Unable to parse '{args[0]}'");
-            }
+            int webhook_sel = Int32.Parse(args[0]);
 
             //- only on init
-            if (null == ALLWebhooks)
+            if (null == ALLWebhooks || webhook_sel < 0)
             {
                 string jsonString = File.ReadAllText($@"{Tools.AssemblyPath}\Webhooks.json");
                 ALLWebhooks = JsonSerializer.Deserialize<Webhooks_Storage>(jsonString);
+
+                // Exit with refresh Webhooks
+                if (webhook_sel < 0)
+                    return;
             }
             try
             {
