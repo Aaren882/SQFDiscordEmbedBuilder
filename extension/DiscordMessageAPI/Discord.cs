@@ -16,6 +16,15 @@ namespace DiscordMessageAPI
 
         internal static async Task HandleRequest(string[] args)
         {
+            try
+            {
+                int webhook_sel = Int32.Parse(args[0]);
+            }
+            catch (FormatException)
+            {
+                Tools.Logger($"Unable to parse '{args[0]}'");
+            }
+
             //- only on init
             if (null == ALLWebhooks)
             {
@@ -27,7 +36,7 @@ namespace DiscordMessageAPI
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
                     // Remove arma quotations
-                    string url = ALLWebhooks.webhooks[0];
+                    string url = ALLWebhooks.webhooks[webhook_sel];
                     string content = args[1].Trim('"',' ').Replace("\"\"", "\"");
                     string username = args[2].Trim('"',' ').Replace("\"\"", "\"");
                     string avatar = args[3].Trim('"',' ').Replace("\"\"", "\"");
