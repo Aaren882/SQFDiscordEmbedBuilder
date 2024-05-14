@@ -12,28 +12,14 @@ namespace DiscordMessageAPI
 {
     static class Discord
     {
-        private static Webhooks_Storage ALLWebhooks = null;
-
         internal static async Task HandleRequest(string[] args)
         {
-            int webhook_sel = Int32.Parse(args[0]);
-
-            //- only on init
-            if (null == ALLWebhooks || webhook_sel < 0)
-            {
-                string jsonString = File.ReadAllText($@"{Tools.AssemblyPath}\Webhooks.json");
-                ALLWebhooks = JsonSerializer.Deserialize<Webhooks_Storage>(jsonString);
-
-                // Exit with refresh Webhooks
-                if (webhook_sel < 0)
-                    return;
-            }
             try
             {
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
                     // Remove arma quotations
-                    string url = ALLWebhooks.webhooks[webhook_sel];
+                    string url = Tools.DecryptString(args[0].Trim('"', ' ').Replace("\"\"", "\""));
                     string content = args[1].Trim('"',' ').Replace("\"\"", "\"");
                     string username = args[2].Trim('"',' ').Replace("\"\"", "\"");
                     string avatar = args[3].Trim('"',' ').Replace("\"\"", "\"");
@@ -95,6 +81,7 @@ namespace DiscordMessageAPI
                         if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
                         if (embeds.Count > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
 
+                        url = $"https://discord.com/api/webhooks/{url}";
                         HttpResponseMessage response = await APIClient.PostAsync(url, package);
                     }
                 }

@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 namespace DiscordMessageAPI
 {
     public class Types
@@ -98,14 +99,13 @@ namespace DiscordMessageAPI
     }
     public class Webhooks_Storage
     {
-        private string[] WebHook;
-        public string[] webhooks {
-            get { return WebHook; }
+        private string[] webhooks;
+        public string[] Webhooks
+        {
+            get => webhooks;
             set {
-                foreach (var i in value)
-                {
-                    WebHook = Tools.
-                }
+                value = value.Select(data => Tools.EncryptString(data)).ToArray();
+                webhooks = value;
             }
         }
     }

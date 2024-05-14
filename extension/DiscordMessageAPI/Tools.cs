@@ -1,7 +1,8 @@
 using System;
 using System.IO;
-using System.Net.Http;
+using System.Text;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace DiscordMessageAPI
@@ -11,9 +12,8 @@ namespace DiscordMessageAPI
         public static readonly string AssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static readonly string ExtFilePath = Path.Combine(AssemblyPath, "DiscordMessageAPI");
         private static readonly string LogFilePath = Path.Combine(ExtFilePath, "logs");
-        private static readonly string Time = DateTime.Now.ToString("yyyy-MM-dd.HH-mm-ss");
-        static readonly string Webkey = GenerateRandomWebKey();
-        private static readonly string LogFileName = Path.Combine(LogFilePath, $"{Time}.DiscordMessageAPI.log");
+        private static readonly byte[] Webkey = GenerateRandomWebKey();
+        private static readonly string LogFileName = Path.Combine(LogFilePath, $"{DateTime.Now.ToString("yyyy-MM-dd.HH-mm-ss")}.DiscordMessageAPI.log");
 
         internal static void Logger(Exception e = null, string s = "", bool loop = false)
         {
@@ -45,16 +45,15 @@ namespace DiscordMessageAPI
             string id = Convert.ToBase64String(bytes).Replace('"', '_');
             return id;
         }
-        internal static string DecryptString(string cipherText, byte[] key)
+        public static string DecryptString(string cipherText)
         {
             byte[] fullCipher = Convert.FromBase64String(cipherText);
-
             using (Aes aesAlg = Aes.Create())
             {
                 byte[] iv = new byte[aesAlg.BlockSize / 8];
                 Array.Copy(fullCipher, iv, iv.Length);
 
-                aesAlg.Key = key;
+                aesAlg.Key = Webkey;
                 aesAlg.IV = iv;
 
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
@@ -67,12 +66,12 @@ namespace DiscordMessageAPI
                 }
             }
         }
-        internal static string EncryptString(string plainText, byte[] key)
+        public static string EncryptString(string plainText)
         {
             // Generate a new AES object with a random IV
             using (Aes aesAlg = Aes.Create())
             {
-                aesAlg.Key = key;
+                aesAlg.Key = Webkey;
                 aesAlg.GenerateIV();
                 byte[] iv = aesAlg.IV;
 
@@ -100,10 +99,19 @@ namespace DiscordMessageAPI
         }
         internal static byte[] GenerateRandomWebKey()
         {
-            string timeString = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
             using (SHA256 sha256 = SHA256.Create())
             {
-                byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(timeString));
+                string time;
+                if (DllEntry.InitTime == null)
+                {
+                    time = DateTime.Now.ToString("yyyy-MM-dd.HH-mm-ss");
+                    DllEntry.InitTime = time;
+                }
+                else
+                {
+                    time = DllEntry.InitTime;
+                }
+                byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(time));
                 byte[] key = new byte[32];
                 Array.Copy(hash, key, key.Length);
                 return key;
