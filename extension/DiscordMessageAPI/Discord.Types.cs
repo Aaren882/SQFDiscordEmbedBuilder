@@ -98,7 +98,16 @@ namespace DiscordMessageAPI
     }
     public class Webhooks_Storage
     {
-        public string[] webhooks { get; set; }
+        private string[] WebHook;
+        public string[] webhooks {
+            get { return WebHook; }
+            set {
+                foreach (var i in value)
+                {
+                    WebHook = Tools.
+                }
+            }
+        }
     }
     public class JSON_MessageTypes
     {

@@ -105,7 +105,7 @@ namespace DiscordMessageAPI
             }
         }
 
-        static void Resize<T>(this List<T> list, int sz, T c)
+        private static void Resize<T>(this List<T> list, int sz, T c)
         {
             int cur = list.Count;
             if (sz < cur)
