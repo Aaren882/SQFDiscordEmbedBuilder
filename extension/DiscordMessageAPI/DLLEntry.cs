@@ -52,7 +52,7 @@ namespace DiscordMessageAPI
             outputSize--;
             try
             {
-                if (inputKey == "init_server" || inputKey == "init_player" || inputKey == "Refresh_Webhooks")
+                if (inputKey == "init_player" || inputKey == "Refresh_Webhooks")
                 {
                     // Use time as Key (for Server , Player)
                     if (ExtensionInit && inputKey != "Refresh_Webhooks")
@@ -62,24 +62,27 @@ namespace DiscordMessageAPI
                     }
 
                     // Get all Webhooks
-                    if (inputKey == "init_server" || inputKey == "Refresh_Webhooks")
+                    if (inputKey == "Refresh_Webhooks")
                     {
                         string jsonString = File.ReadAllText($@"{Tools.AssemblyPath}\Webhooks.json");
                         ALLWebhooks = JsonSerializer.Deserialize<Webhooks_Storage>(jsonString);
-                        int webhook_sel = Int32.Parse(args[0]);
+                        int webhooksCount = ALLWebhooks.Webhooks.Length;
+                        int webhook_sel = Math.Min(Int32.Parse(args[0]), webhooksCount - 1);
                         ExtensionInit = true;
 
+                        //- Exit if there's no Webhook
+                        if (webhooksCount == 0)
+                        {
+                            output.Append("No Webhook Exist.");
+                            return 0;
+                        }
+
                         output.Append($"[\"{ALLWebhooks.Webhooks[webhook_sel]}\",\"{InitTime}\"]");
+                        return webhooksCount;
                     }
                     else //- Initation for Clients (Players)
                         InitTime = args[0];
 
-                    if (ALLWebhooks.Webhooks.Length == 0)
-                    {
-                        output.Append("No Webhook Exist.");
-                        return -12;
-                    }
-                    return 1;
                 }
                 else
                 {
