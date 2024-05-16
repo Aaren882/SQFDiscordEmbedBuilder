@@ -4,6 +4,7 @@ using System.Text;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace DiscordMessageAPI
 {
@@ -38,12 +39,18 @@ namespace DiscordMessageAPI
                     Logger(i, null, true);
             };
         }
-        internal static string GenTimeEncode()
+        internal static string ParseJson(string file)
         {
-            long ticks = DateTime.Now.Ticks;
-            byte[] bytes = BitConverter.GetBytes(ticks);
-            string id = Convert.ToBase64String(bytes).Replace('"', '_');
-            return id;
+            // if no disk "dir" defined
+            try
+            {
+                string dir = file.IndexOf(":") < 0 ? $@"{AssemblyPath}\{file}" : file;
+                return File.ReadAllText(dir);
+            }
+            catch (Exception e)
+            {
+                return $"{e}";
+            }
         }
         public static string DecryptString(string cipherText)
         {

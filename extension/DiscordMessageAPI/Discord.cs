@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Net;
 
@@ -12,21 +11,58 @@ namespace DiscordMessageAPI
 {
     static class Discord
     {
-        internal static async Task HandleRequest(string[] args)
+        internal static async void HandlerJson(string[] args)
+        {
+            //- ["url","json"]
+            try 
+            {
+                string url = Tools.DecryptString(args[0]);
+                string json = Tools.ParseJson(args[1]);
+                using (MultipartFormDataContent package = new MultipartFormDataContent())
+                {
+                    Tools.Logger(null, json);
+                    package.Add(new StringContent(json, Encoding.UTF8), "payload_json");
+                    await DiscordMsg(url, package);
+                }
+            }
+            catch (Exception e)
+            {
+                Tools.Logger(e,$"{e}");
+            }
+        }
+        internal static async void HandlerJsonFormat(string[] args)
+        {
+            //- ["url","json"]
+            try 
+            {
+                string url = Tools.DecryptString(args[0]);
+                string json = args[1];
+                using (MultipartFormDataContent package = new MultipartFormDataContent())
+                {
+                    Tools.Logger(null, json);
+                    package.Add(new StringContent(json, Encoding.UTF8), "payload_json");
+                    await DiscordMsg(url, package);
+                }
+            }
+            catch (Exception e)
+            {
+                Tools.Logger(e,$"{e}");
+            }
+        }
+        internal static async void HandleRequest(string[] args)
         {
             try
             {
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
-                    // Remove arma quotations
-                    string url = Tools.DecryptString(args[0].Trim('"', ' ').Replace("\"\"", "\""));
-                    string content = args[1].Trim('"',' ').Replace("\"\"", "\"");
-                    string username = args[2].Trim('"',' ').Replace("\"\"", "\"");
-                    string avatar = args[3].Trim('"',' ').Replace("\"\"", "\"");
+                    string url = Tools.DecryptString(args[0]);
+                    string content = args[1];
+                    string username = args[2];
+                    string avatar = args[3];
                     string tts = args[4];
 
                     //- File Stream
-                    string filePath = $"{args[5]}".Trim('"',' ').Replace("\"\"", "\"");
+                    string filePath = $"{args[5]}";
 
                     // Discord 2000 character limit
                     if (content.Length > 1999) content = content.Substring(0, 1999);
@@ -52,43 +88,46 @@ namespace DiscordMessageAPI
                     // Prepare the embeds JSON data
                     string embedsJson = BuildEmbedsJson(embeds);
 
-                    // Execute webhook
-                    ServicePointManager.Expect100Continue = true;
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 |
-                         SecurityProtocolType.Tls |
-                         SecurityProtocolType.Tls11 |
-                         SecurityProtocolType.Ssl3;
-                    
-                    using (HttpClient APIClient = new HttpClient())
+                    // Bare bones
+                    package.Add(new StringContent(content), "content");
+                    package.Add(new StringContent(tts), "tts");
+
+                    //- Send File .png
+                    if (filePath.Length > 0)
                     {
-                        // Bare bones
-                        package.Add(new StringContent(content), "content");
-                        package.Add(new StringContent(tts), "tts");
-
-
-                        //- Send File .png
-                        if (filePath.Length > 0)
+                        using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
                         {
-                            using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
-                            {
-                                byte[] fileBytes = new byte[fileStream.Length];
-                                await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
-                                package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
-                            }
+                            byte[] fileBytes = new byte[fileStream.Length];
+                            await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
+                            package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
                         }
-
-                        if (username.Length > 0) package.Add(new StringContent(username), "username");
-                        if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
-                        if (embeds.Count > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
-
-                        url = $"https://discord.com/api/webhooks/{url}";
-                        HttpResponseMessage response = await APIClient.PostAsync(url, package);
                     }
+                    if (username.Length > 0) package.Add(new StringContent(username), "username");
+                    if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
+                    if (embeds.Count > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
+
+                    await DiscordMsg(url, package);
                 }
             }
             catch (Exception e)
             {
                 Tools.Logger(e);
+            }
+        }
+
+        internal static async Task DiscordMsg(string url, MultipartFormDataContent package)
+        {
+            // Execute webhook
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 |
+                 SecurityProtocolType.Tls |
+                 SecurityProtocolType.Tls11 |
+                 SecurityProtocolType.Ssl3;
+
+            using (HttpClient APIClient = new HttpClient())
+            {
+                url = $"https://discord.com/api/webhooks/{url}";
+                HttpResponseMessage response = await APIClient.PostAsync(url, package);
             }
         }
 
