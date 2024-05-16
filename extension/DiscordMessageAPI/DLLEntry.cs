@@ -1,6 +1,7 @@
 using RGiesecke.DllExport;
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -52,54 +53,87 @@ namespace DiscordMessageAPI
             outputSize--;
             try
             {
-                if (inputKey == "init_player" || inputKey == "Refresh_Webhooks")
+                // Remove arma quotations
+                args = args.Select(arg => arg.Trim('"', ' ').Replace("\"\"", "\"")).ToArray();
+
+                //Entry
+                switch (inputKey == "init_player" || inputKey == "Refresh_Webhooks")
                 {
-                    // Use time as Key (for Server , Player)
-                    if (ExtensionInit && inputKey != "Refresh_Webhooks")
+                    //- Init Functions 
+                    case true:
                     {
-                        output.Append("Extension has already been initiated.");
-                        return -1;
-                    }
-
-                    // Get all Webhooks
-                    if (inputKey == "Refresh_Webhooks")
-                    {
-                        string jsonString = File.ReadAllText($@"{Tools.AssemblyPath}\Webhooks.json");
-                        ALLWebhooks = JsonSerializer.Deserialize<Webhooks_Storage>(jsonString);
-                        int webhooksCount = ALLWebhooks.Webhooks.Length;
-                        int webhook_sel = Math.Min(Int32.Parse(args[0]), webhooksCount - 1);
-                        ExtensionInit = true;
-
-                        //- Exit if there's no Webhook
-                        if (webhooksCount == 0)
+                        // Use time as Key (for Server , Player)
+                        if (ExtensionInit && inputKey != "Refresh_Webhooks")
                         {
-                            output.Append("No Webhook Exist.");
-                            return 0;
+                            output.Append("Extension has already been initiated.");
+                            return -1;
                         }
 
-                        output.Append($"[\"{ALLWebhooks.Webhooks[webhook_sel]}\",\"{InitTime}\"]");
-                        return webhooksCount;
-                    }
-                    else //- Initation for Clients (Players)
-                        InitTime = args[0];
+                        // Get all Webhooks
+                        if (inputKey == "Refresh_Webhooks")
+                        {
+                            string jsonString = Tools.ParseJson("Webhooks.json");
+                            ALLWebhooks = JsonSerializer.Deserialize<Webhooks_Storage>(jsonString);
+                            int webhooksCount = ALLWebhooks.Webhooks.Length;
+                            int webhook_sel = Math.Min(Int32.Parse(args[0]), webhooksCount - 1);
+                            ExtensionInit = true;
 
-                }
-                else
-                {
-                    if (inputKey == InitTime)
-                    {
-                        if (argCount == 8) // async without await because we don't expect a reply
-                        {
-                            Discord.HandleRequest(args);
+                            //- Exit if there's no Webhook
+                            if (webhooksCount == 0)
+                            {
+                                output.Append("No Webhook Exist.");
+                                return 0;
+                            }
+
+                            output.Append($"[\"{ALLWebhooks.Webhooks[webhook_sel]}\",\"{InitTime}\"]");
+                            return webhooksCount;
                         }
-                        else
-                        {
-                            output.Append("INCORRECT NUMBER OF ARGUMENTS");
-                            return -2;
-                        }
+                        else //- Initation for Clients (Players)
+                            InitTime = args[0];
+                        break;
                     }
-                    else
-                        output.Append("Find No Key.");
+                    default:
+                    {
+                        switch (inputKey)
+                        {
+                            case "ParseJson":
+                            {
+                                output.Append(Tools.ParseJson(args[0]));
+                                break;
+                            }
+                            //- Load Json as Message format
+                            case "HandlerJson":
+                            {
+                                Discord.HandlerJson(args);
+                                break;
+                            }
+                            case "HandlerJsonFormat":
+                            {
+                                Discord.HandlerJsonFormat(args);
+                                break;
+                            }
+                            case string InitTime:
+                            {
+                                if (argCount == 8) // async without await because we don't expect a reply
+                                {
+                                    Discord.HandleRequest(args);
+                                }
+                                else
+                                {
+                                    output.Append("INCORRECT NUMBER OF ARGUMENTS");
+                                    return -2;
+                                }
+                                break;
+                            }
+                            default: //- Other conditions
+                            {
+                                output.Append("Find No Key.");
+                                break;
+                            }
+                        }
+
+                        break; //- Exit
+                    }
                 }
 
                 return 0;
