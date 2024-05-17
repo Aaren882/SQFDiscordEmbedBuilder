@@ -85,7 +85,11 @@ namespace DiscordMessageAPI
                                 return 0;
                             }
 
-                            output.Append($"[\"{ALLWebhooks.Webhooks[webhook_sel]}\",\"{InitTime}\"]");
+                            if (webhook_sel < 0) // output can be like ["ww", "ww"]
+                                output.Append($"[[\"{string.Join("\",\"", ALLWebhooks.Webhooks)}\"],\"{InitTime}\"]");
+                            else
+                                output.Append($"[\"{ALLWebhooks.Webhooks[webhook_sel]}\",\"{InitTime}\"]");
+
                             return webhooksCount;
                         }
                         else //- Initation for Clients (Players)
@@ -94,6 +98,11 @@ namespace DiscordMessageAPI
                     }
                     default:
                     {
+                        if (InitTime == null)
+                        {
+                            output.Append("Find No Key.");
+                            break;
+                        }
                         switch (inputKey)
                         {
                             case "ParseJson":
@@ -112,7 +121,7 @@ namespace DiscordMessageAPI
                                 Discord.HandlerJsonFormat(args);
                                 break;
                             }
-                            case string InitTime:
+                            default: //- Other conditions
                             {
                                 if (argCount == 8) // async without await because we don't expect a reply
                                 {
@@ -123,11 +132,6 @@ namespace DiscordMessageAPI
                                     output.Append("INCORRECT NUMBER OF ARGUMENTS");
                                     return -2;
                                 }
-                                break;
-                            }
-                            default: //- Other conditions
-                            {
-                                output.Append("Find No Key.");
                                 break;
                             }
                         }
