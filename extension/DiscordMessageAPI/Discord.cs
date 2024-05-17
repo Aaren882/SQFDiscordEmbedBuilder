@@ -20,7 +20,6 @@ namespace DiscordMessageAPI
                 string json = Tools.ParseJson(args[1]);
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
-                    Tools.Logger(null, json);
                     package.Add(new StringContent(json, Encoding.UTF8), "payload_json");
                     await DiscordMsg(url, package);
                 }
