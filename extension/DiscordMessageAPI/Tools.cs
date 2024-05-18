@@ -45,9 +45,8 @@ namespace DiscordMessageAPI
             try
             {
                 string dir = file.IndexOf(":") < 0 ? $@"{AssemblyPath}\{file}" : file;
-                byte[] utf8 = Encoding.UTF8.GetBytes(File.ReadAllText(dir));
-                Logger(null, File.ReadAllText(dir));
-                return Encoding.UTF8.GetString(utf8);
+                Logger(null, );
+                return File.ReadAllText(dir);
             }
             catch (Exception e)
             {
