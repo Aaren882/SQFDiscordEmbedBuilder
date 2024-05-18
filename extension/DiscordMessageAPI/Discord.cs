@@ -11,17 +11,17 @@ namespace DiscordMessageAPI
 {
     static class Discord
     {
-        internal static async void HandlerJson(string[] args)
+        internal static async void HandlerJson(string[] args, string url)
         {
             //- ["url","json"]
             try 
             {
-                string url = Tools.DecryptString(args[0]);
+                string url = Tools.DecryptString(url);
                 string json = Tools.ParseJson(args[1]);
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
                     package.Add(new StringContent(json, Encoding.UTF8), "payload_json");
-                    await DiscordMsg(url, package);
+                    await DiscordMsg(url, package, args[0]);
                 }
             }
             catch (Exception e)
@@ -29,7 +29,7 @@ namespace DiscordMessageAPI
                 Tools.Logger(e,$"{e}");
             }
         }
-        internal static async void HandlerJsonFormat(string[] args)
+        internal static async void HandlerJsonFormat(string[] args, string url)
         {
             //- ["url","json"]
             try 
@@ -48,13 +48,13 @@ namespace DiscordMessageAPI
                 Tools.Logger(e,$"{e}");
             }
         }
-        internal static async void HandleRequest(string[] args)
+        internal static async void HandleRequest(string[] args, string url)
         {
             try
             {
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
-                    string url = Tools.DecryptString(args[0]);
+                    string url = Tools.DecryptString(url);
                     string content = args[1];
                     string username = args[2];
                     string avatar = args[3];
@@ -113,9 +113,12 @@ namespace DiscordMessageAPI
                 Tools.Logger(e);
             }
         }
+        
+        internal static async Task DiscordMsg(string url, MultipartFormDataContent package, var HandlerType)
+        {   
+            //- [ Handler<int> , Required Payload<object> ]
+            var HandlerType = JsonSerializer.Deserialize<object[]>(HandlerType).ToArray()
 
-        internal static async Task DiscordMsg(string url, MultipartFormDataContent package)
-        {
             // Execute webhook
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 |
@@ -125,8 +128,19 @@ namespace DiscordMessageAPI
 
             using (HttpClient APIClient = new HttpClient())
             {
-                url = $"https://discord.com/api/webhooks/{url}";
-                HttpResponseMessage response = await APIClient.PostAsync(url, package);
+                switch (HandlerType[0])
+                {
+                    case 1: //- Http (Patch) request for Editting Message 
+                    {
+                        HttpResponseMessage response = await client.PatchAsync($"https://discord.com/api/webhooks/{url}/messages/{HandlerType[1]}", package);
+                        break;
+                    }
+                    default:
+                    {
+                        HttpResponseMessage response = await APIClient.PostAsync($"https://discord.com/api/webhooks/{url}", package);
+                        break;
+                    }
+                }
             }
         }
 

@@ -103,17 +103,22 @@ namespace DiscordMessageAPI
                             output.Append("Find No Key.");
                             break;
                         }
+                        if (inputKey == "ParseJson")
+                        {
+                            output.Append(Tools.ParseJson(args[0]));
+                            break;
+                        }
+
+                        //- Http(s) Handlers ["url", HandlerType<int>, Optional :[Necessary Payload] ]
+                        var args[0] = JsonSerializer.Deserialize<object[]>(args[0]);
+                        string url = args[0][0];
+
                         switch (inputKey)
                         {
-                            case "ParseJson":
-                            {
-                                output.Append(Tools.ParseJson(args[0]));
-                                break;
-                            }
                             //- Load Json as Message format
                             case "HandlerJson":
                             {
-                                Discord.HandlerJson(args);
+                                Discord.HandlerJson(args, url);
                                 break;
                             }
                             case "HandlerJsonFormat":
@@ -121,12 +126,10 @@ namespace DiscordMessageAPI
                                 Discord.HandlerJsonFormat(args);
                                 break;
                             }
-                            default: //- Other conditions
+                            case "SendMessage":
                             {
                                 if (argCount == 8) // async without await because we don't expect a reply
-                                {
                                     Discord.HandleRequest(args);
-                                }
                                 else
                                 {
                                     output.Append("INCORRECT NUMBER OF ARGUMENTS");
@@ -134,6 +137,8 @@ namespace DiscordMessageAPI
                                 }
                                 break;
                             }
+                            default: //- Other conditions
+                                break;
                         }
 
                         break; //- Exit
