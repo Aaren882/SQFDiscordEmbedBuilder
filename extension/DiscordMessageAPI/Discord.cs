@@ -3,25 +3,26 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace DiscordMessageAPI
 {
     static class Discord
     {
-        internal static async void HandlerJson(string[] args, string url)
+        internal static async void HandlerJson(string[] args)
         {
             //- ["url","json"]
             try 
             {
-                string url = Tools.DecryptString(url);
                 string json = Tools.ParseJson(args[1]);
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
                     package.Add(new StringContent(json, Encoding.UTF8), "payload_json");
-                    await DiscordMsg(url, package, args[0]);
+                    await DiscordMsg(args[0],package);
                 }
             }
             catch (Exception e)
@@ -29,18 +30,16 @@ namespace DiscordMessageAPI
                 Tools.Logger(e,$"{e}");
             }
         }
-        internal static async void HandlerJsonFormat(string[] args, string url)
+        internal static async void HandlerJsonFormat(string[] args)
         {
             //- ["url","json"]
             try 
             {
-                string url = Tools.DecryptString(args[0]);
                 string json = args[1];
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
-                    Tools.Logger(null, json);
                     package.Add(new StringContent(json, Encoding.UTF8), "payload_json");
-                    await DiscordMsg(url, package);
+                    await DiscordMsg(args[0], package);
                 }
             }
             catch (Exception e)
@@ -48,13 +47,12 @@ namespace DiscordMessageAPI
                 Tools.Logger(e,$"{e}");
             }
         }
-        internal static async void HandleRequest(string[] args, string url)
+        internal static async void HandleRequest(string[] args)
         {
             try
             {
                 using (MultipartFormDataContent package = new MultipartFormDataContent())
                 {
-                    string url = Tools.DecryptString(url);
                     string content = args[1];
                     string username = args[2];
                     string avatar = args[3];
@@ -105,7 +103,7 @@ namespace DiscordMessageAPI
                     if (avatar.Length > 0) package.Add(new StringContent(avatar), "avatar_url");
                     if (embeds.Count > 0) package.Add(new StringContent(embedsJson, Encoding.UTF8), "payload_json");
 
-                    await DiscordMsg(url, package);
+                    await DiscordMsg(args[0], package);
                 }
             }
             catch (Exception e)
@@ -114,10 +112,13 @@ namespace DiscordMessageAPI
             }
         }
         
-        internal static async Task DiscordMsg(string url, MultipartFormDataContent package, var HandlerType)
-        {   
+        internal static async Task DiscordMsg(string handlerPayload, MultipartFormDataContent package)
+        {
             //- [ Handler<int> , Required Payload<object> ]
-            var HandlerType = JsonSerializer.Deserialize<object[]>(HandlerType).ToArray()
+            object[] HandlerType = JsonSerializer.Deserialize<object[]>(handlerPayload);
+            string url = HandlerType[0].ToString();
+
+            url = Tools.DecryptString(url);
 
             // Execute webhook
             ServicePointManager.Expect100Continue = true;
@@ -128,11 +129,11 @@ namespace DiscordMessageAPI
 
             using (HttpClient APIClient = new HttpClient())
             {
-                switch (HandlerType[0])
+                switch (HandlerType[1].ToString())
                 {
-                    case 1: //- Http (Patch) request for Editting Message 
+                    case "1": //- Http(s) (Patch) request for Editting Message 
                     {
-                        HttpResponseMessage response = await client.PatchAsync($"https://discord.com/api/webhooks/{url}/messages/{HandlerType[1]}", package);
+                        HttpResponseMessage response = await APIClient.PatchAsync($"https://discord.com/api/webhooks/{url}/messages/{HandlerType[2]}", package);
                         break;
                     }
                     default:
@@ -143,6 +144,17 @@ namespace DiscordMessageAPI
                 }
             }
         }
+
+        // - Make a PATCH Http Request
+        private static async Task<HttpResponseMessage> PatchAsync(this HttpClient client, string requestUri, HttpContent content)
+        {
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri)
+            {
+                Content = content
+            };
+            return await client.SendAsync(request);
+        }
+
 
         private static void Resize<T>(this List<T> list, int sz, T c)
         {
