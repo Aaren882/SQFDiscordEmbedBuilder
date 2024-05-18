@@ -98,27 +98,25 @@ namespace DiscordMessageAPI
                     }
                     default:
                     {
-                        if (InitTime == null)
-                        {
-                            output.Append("Find No Key.");
-                            break;
-                        }
                         if (inputKey == "ParseJson")
                         {
                             output.Append(Tools.ParseJson(args[0]));
                             break;
                         }
+                        if (InitTime == null)
+                        {
+                            output.Append("Find No Key.");
+                            break;
+                        }
 
-                        //- Http(s) Handlers ["url", HandlerType<int>, Optional :[Necessary Payload] ]
-                        var args[0] = JsonSerializer.Deserialize<object[]>(args[0]);
-                        string url = args[0][0];
-
+                        //- args[0] :
+                            //- Http(s) Handlers ["url", HandlerType<int>, Optional :[Necessary Payload] ]
                         switch (inputKey)
                         {
                             //- Load Json as Message format
                             case "HandlerJson":
                             {
-                                Discord.HandlerJson(args, url);
+                                Discord.HandlerJson(args);
                                 break;
                             }
                             case "HandlerJsonFormat":
