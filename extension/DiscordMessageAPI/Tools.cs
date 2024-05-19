@@ -45,13 +45,31 @@ namespace DiscordMessageAPI
             try
             {
                 string dir = file.IndexOf(":") < 0 ? $@"{AssemblyPath}\{file}" : file;
-                Logger(null, );
                 return File.ReadAllText(dir);
             }
             catch (Exception e)
             {
                 return $"{e}";
             }
+        }
+
+        internal static int[] StringToCode32(string str)
+        {
+            int[] code32 = new int[str.Length];
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                // Get the Unicode code point of each character in the string
+                code32[i] = char.ConvertToUtf32(str, i);
+
+                // If the character is a surrogate pair, skip the next character
+                if (char.IsHighSurrogate(str, i))
+                {
+                    i++;
+                }
+            }
+
+            return code32;
         }
         public static string DecryptString(string cipherText)
         {
