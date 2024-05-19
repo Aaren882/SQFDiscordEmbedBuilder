@@ -100,9 +100,8 @@ namespace DiscordMessageAPI
                     {
                         if (inputKey == "ParseJson")
                         {
-                            byte[] utf8 = Encoding.UTF8.GetBytes(Tools.ParseJson(args[0]));
-                            string utf8_String = Encoding.UTF8.GetString(utf8)
-                            output.Append(utf8_String);
+                            int[] utf = Tools.StringToCode32(Tools.ParseJson(args[0]));
+                            output.Append($"[{string.Join(",", utf)}]");
                             break;
                         }
                         if (InitTime == null)
