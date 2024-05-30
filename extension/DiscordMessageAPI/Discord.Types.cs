@@ -21,6 +21,16 @@ namespace DiscordMessageAPI
             public string FooterIconUrl { get; set; }
             public List<Types.FieldData> Fields { get; set; } = new List<Types.FieldData>();
 
+            string RandomColor() {
+                Random random = new Random();
+                int red = random.Next(256);
+                int green = random.Next(256);
+                int blue = random.Next(256);
+
+                // Combine red, green, and blue into a single 24-bit integer
+                return $"{(red << 16) | (green << 8) | blue}";
+            }
+
             public string BuildFields()
             {
                 var result = new StringBuilder();
@@ -44,9 +54,9 @@ namespace DiscordMessageAPI
                 Color = data.Count > 2 ? (string)data[2] : "14177041";
 
                 if (data.Count > 2) {
-                    Color = data[2] != "" ? "" : "14177041";
+                    Color = data[2] != "" ? "" : RandomColor();
                 } else {
-                    Color = "14177041";
+                    Color = RandomColor();
                 }
 
                 if (data.Count > 3) {
