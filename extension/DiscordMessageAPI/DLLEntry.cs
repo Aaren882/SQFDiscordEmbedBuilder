@@ -130,13 +130,11 @@ namespace DiscordMessageAPI
                             {
                                 if (argCount == 8) // async without await because we don't expect a reply
                                 {
-                                    string file = args[5];
-                                    if (file.Length > 0)
-                                    {
-                                        string[] codePointStrings = Regex.Replace(file, @"[\[\]]", "").Split(',');
+                                    string[] codePointStrings = Regex.Replace(args[5], @"[\[\]]", "").Split(',');
+                                    if (codePointStrings.Length > 1)
                                         args[5] = string.Concat(codePointStrings.Select(cp => char.ConvertFromUtf32(int.Parse(cp))));
-                                    }
-                                            
+                                    else
+                                        file = "";
                                     Discord.HandleRequest(args);
                                 }
                                 else
