@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DiscordMessageAPI
 {
@@ -128,7 +129,16 @@ namespace DiscordMessageAPI
                             case "SendMessage":
                             {
                                 if (argCount == 8) // async without await because we don't expect a reply
+                                {
+                                    string file = args[5];
+                                    if (file.Length > 0)
+                                    {
+                                        string[] codePointStrings = Regex.Replace(file, @"[\[\]]", "").Split(',');
+                                        args[5] = string.Concat(codePointStrings.Select(cp => char.ConvertFromUtf32(int.Parse(cp))));
+                                    }
+                                            
                                     Discord.HandleRequest(args);
+                                }
                                 else
                                 {
                                     output.Append("INCORRECT NUMBER OF ARGUMENTS");

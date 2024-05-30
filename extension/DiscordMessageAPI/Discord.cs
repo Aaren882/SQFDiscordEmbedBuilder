@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace DiscordMessageAPI
 {
@@ -59,7 +60,7 @@ namespace DiscordMessageAPI
                     string tts = args[4];
 
                     //- File Stream
-                    string filePath = $"{args[5]}";
+                    string filePath = args[5];
 
                     // Discord 2000 character limit
                     if (content.Length > 1999) content = content.Substring(0, 1999);

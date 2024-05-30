@@ -3,8 +3,6 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
-using System.Text.Json;
 
 namespace DiscordMessageAPI
 {
