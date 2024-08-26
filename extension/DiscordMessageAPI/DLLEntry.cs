@@ -133,8 +133,6 @@ namespace DiscordMessageAPI
                                     string[] codePointStrings = Regex.Replace(args[5], @"[\[\]]", "").Split(',');
                                     if (codePointStrings.Length > 1)
                                         args[5] = string.Concat(codePointStrings.Select(cp => char.ConvertFromUtf32(int.Parse(cp))));
-                                    else
-                                        file = "";
                                     Discord.HandleRequest(args);
                                 }
                                 else
