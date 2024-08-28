@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Configuration.Assemblies;
 
 namespace DiscordMessageAPI
 {
@@ -93,11 +94,12 @@ namespace DiscordMessageAPI
                     //- Send File .png
                     if (filePath.Length > 0)
                     {
+                        filePath = Path.Combine(Tools.AssemblyPath, filePath);
                         using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
                         {
                             byte[] fileBytes = new byte[fileStream.Length];
                             await fileStream.ReadAsync(fileBytes, 0, fileBytes.Length);
-                            package.Add(new ByteArrayContent(fileBytes), "file", Path.GetFileName(filePath));
+                            package.Add(new ByteArrayContent(fileBytes), "file", filePath);
                         }
                     }
                     if (username.Length > 0) package.Add(new StringContent(username), "username");

@@ -54,6 +54,13 @@ namespace DiscordMessageAPI
             outputSize--;
             try
             {
+                // Use time as Key (for Server , Player)
+                if (ExtensionInit && inputKey == "init_player")
+                {
+                    output.Append("Extension has already been initiated.");
+                    return -1;
+                }
+
                 // Remove arma quotations
                 args = args.Select(arg => arg.Trim('"', ' ').Replace("\"\"", "\"")).ToArray();
 
@@ -63,13 +70,6 @@ namespace DiscordMessageAPI
                     //- Init Functions 
                     case true:
                     {
-                        // Use time as Key (for Server , Player)
-                        if (ExtensionInit && inputKey != "Refresh_Webhooks")
-                        {
-                            output.Append("Extension has already been initiated.");
-                            return -1;
-                        }
-
                         // Get all Webhooks
                         if (inputKey == "Refresh_Webhooks")
                         {
@@ -94,7 +94,7 @@ namespace DiscordMessageAPI
                             return webhooksCount;
                         }
                         else //- Initation for Clients (Players)
-                            InitTime = args[0];
+                            InitTime = args[0]; //- From Server
                         break;
                     }
                     default:
