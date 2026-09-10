@@ -1,3 +1,5 @@
+using System.Text.Json;
+using Component.DiscordEntity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Arma3WebService.DBContext.Schema;
@@ -5,20 +7,33 @@ namespace Arma3WebService.DBContext.Schema;
 [PrimaryKey(nameof(messageId))]
 public class ServerInfoTemplate
 {
-	private string _messageTemplatePath = ".profile/MessageTemplate/default.json";
-	private string _messageOfflinePath = ".profile/MessageOfflineTemplate/default.json";
-
 	public ulong messageId { get; set; }
 
-	public string? messageTemplatePath
+	private const string _messageTemplatePath = ".profile/MessageTemplate/default.json";
+	private string? _messageTemplate = null;
+	public string messageTemplate
 	{
-		get => Path.GetFullPath(_messageTemplatePath);
-		set => _messageTemplatePath = value ?? _messageTemplatePath;
+		get => _messageTemplate ?? File.ReadAllText(_messageTemplatePath);
+		set
+		{
+			if (value != null)
+				_messageTemplate = value;
+		}
 	}
-	public string? messageOfflinePath
+
+	private const string _messageOfflinePath = ".profile/MessageOfflineTemplate/default.json";
+	private DiscordMessageDto _messageOffline =
+		JsonSerializer.Deserialize(File.ReadAllText(_messageOfflinePath), MsgPayload_JsonContext.Default.DiscordMessageDto)
+		?? throw new NullReferenceException($"Default messageOfflinePath \"{nameof(_messageOfflinePath)}\" is not exist.");
+
+	public DiscordMessageDto messageOffline
 	{
-		get => Path.GetFullPath(_messageOfflinePath);
-		set => _messageOfflinePath = value ?? _messageOfflinePath;
+		get => _messageOffline;
+		set
+		{
+			if (value != null)
+				_messageOffline = value;
+		}
 	}
 	public string? messageActionPath { get; set; }
 

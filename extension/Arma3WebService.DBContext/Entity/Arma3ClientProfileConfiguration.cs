@@ -1,57 +1,40 @@
+using System.Text;
+using System.Text.Json;
 using Arma3WebService.DBContext.Schema;
+using Component.DiscordEntity;
+using Components.Entity;
 
 namespace Arma3WebService.DBContext.Entity;
 
-public record struct Arma3ClientProfileConfiguration
+public static class ClientProfileConfiguration
 {
-	private FileInfo? _messageTemplate;
-	private FileInfo? _messageOfflineTemplate;
-	private FileInfo? _messageActions;
-
-	public string? MessageTemplate
+	public static ServerInfoTemplate CreateInfoTemplate(this Arma3ClientProfileConfiguration configuration, ulong messageId)
 	{
-		readonly get => _messageTemplate?.FullName;
-		set
-		{
-			if (value is not null)
-			{
-				_messageTemplate = new (
-					Path.GetFullPath($".profile/MessageTemplate/{Path.GetFileName(value)}")
-				);
-			}
-		}
-	}
-
-	public string? MessageOfflineTemplate
-	{
-		readonly get => _messageOfflineTemplate?.FullName;
-		set
-		{
-			if (value is not null)
-			{
-				_messageOfflineTemplate = new (
-					Path.GetFullPath($".profile/MessageOfflineTemplate/{Path.GetFileName(value)}")
-				);
-			}
-		}
-	}
-
-	public string? MessageActions
-	{
-		readonly get => _messageActions?.FullName;
-		set => _messageActions = new FileInfo(
-			Path.GetFullPath($".profile/MessageActions/{Path.GetFileName(value)}")
-		);
-	}
-
-	public readonly ServerInfoTemplate CreateInfoTemplate(ulong messageId)
-	{
-		return new()
+		var (MessageTemplate, MessageOfflineTemplate, MessageActions) = configuration;
+		ServerInfoTemplate template = new()
 		{
 			messageId = messageId,
-			messageTemplatePath = MessageTemplate,
-			messageOfflinePath = MessageOfflineTemplate,
 			messageActionPath = MessageActions,
 		};
+		if (File.Exists(MessageOfflineTemplate))
+		{
+			var deserializedMsg = JsonSerializer.Deserialize(
+				ReadAllTextShared(MessageOfflineTemplate),
+				MsgPayload_JsonContext.Default.DiscordMessageDto
+			);
+			template.messageOffline = deserializedMsg ?? throw new NullReferenceException("Invalid MessageOfflineTemplate = \"Null\".");
+		}
+		if (File.Exists(MessageTemplate))
+		{
+			template.messageTemplate = ReadAllTextShared(MessageTemplate);
+		}
+
+		return template;
+	}
+	private static string ReadAllTextShared(string path)
+	{
+		using FileStream fs = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+		using StreamReader sr = new(fs, Encoding.UTF8);
+		return sr.ReadToEnd();
 	}
 }
