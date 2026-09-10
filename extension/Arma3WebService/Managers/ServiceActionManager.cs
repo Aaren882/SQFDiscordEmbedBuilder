@@ -20,8 +20,8 @@ public sealed class ServiceActionManager(
 	IServiceProvider serviceProvider,
 	IDiscordBotService discordBotService,
 	DiscordBotRequestHandler requestHandler,
+	UpdateDBActionBroker updateDBActionBroker,
 	BinaryStreamManager binaryStreamManager,
-	BinaryPayloadBroker binaryPayloadBroker,
 	IServerIdentityRepository identityRepository,
 	IServerInfoTemplateRepository infoRepository
 )
@@ -34,45 +34,18 @@ public sealed class ServiceActionManager(
 	{
 		return connection.SendAsync(payload.ToJsonString(), WebSocketMessageType.Text, true);
 	}
-	public ValueTask BinaryAction(WebsocketServer connection, Arma3PayloadBinary payload)
+
+	public async ValueTask UpdateDBAction(WebsocketServer connection, Arma3PayloadUpdateDB payload)
 	{
-		logger.LogInformation("Receiving metaData for binary file '{Payload}'", payload);
-		var (FileName, _, _, _, DirectoryPrefix) = payload;
+		logger.LogInformation("Receiving UpdateDBAction : '{RequestAction}'", payload);
 
-		if (DirectoryPrefix != null && !Directory.Exists(payload.DirectoryPrefix))
-			Directory.CreateDirectory(payload.DirectoryPrefix!);
-
-		string? profileName = connection.websocketContext.GetIdentity();
-		var payloadId = payload.GetIdentifier(profileName);
-		FileStream fs = new(
-			Path.Combine(DirectoryPrefix ?? ".temp", FileName),
-			FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite
-		);
-		binaryStreamManager.TryAddBinaryValue(payloadId, payload, fs, async (WrittenContent) =>
-		{
-			var (_, writeStream, _, _) = WrittenContent;
-			try
-			{
-				await writeStream.DisposeAsync();
-				binaryPayloadBroker.Publish(profileName + FileName); //- Invoke subscribed events
-			}
-			catch (Exception ex)
-			{
-				logger.LogWarning(ex, "[{profileName}] having trouble with \"{FileName}\".", profileName, FileName);
-			}
-		});
-
-		return ValueTask.CompletedTask;
-	}
-	public async ValueTask BinaryContentAction(WebsocketServer connection, Arma3PayloadBinaryContent payload)
-	{
 		try
 		{
-			await binaryStreamManager.PushBinaryContentAsync(payload);
+			await updateDBActionBroker.AddAsync(connection, payload);
 		}
 		catch (Exception e)
 		{
-			logger.LogError(e, "\"{Action}\" threw an exception...", nameof(BinaryContentAction));
+			logger.LogError(e, "\"{Action}\" threw an exception...", nameof(ServiceRequestAction));
 			throw;
 		}
 	}
