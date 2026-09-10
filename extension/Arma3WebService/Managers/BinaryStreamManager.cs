@@ -1,127 +1,99 @@
 using System.Collections.Concurrent;
 using System.Threading.Channels;
 using Components.Entity;
+using static Arma3WebService.Managers.BinaryStreamManager;
 
 namespace Arma3WebService.Managers;
 
-public sealed class BinaryStreamManager
+public sealed class BinaryStreamManager(
+	ILogger<BinaryStreamManager> Logger,
+	Channel<Arma3PayloadBinaryContent> _contentChannel,
+	ConcurrentDictionary<string, Content> ContentDictionary,
+	ConcurrentDictionary<string, Channel<Arma3PayloadBinaryContent>> ContentChannelDictionary
+) : BackgroundService
 {
-	private readonly ILogger<BinaryStreamManager> Logger;
-	private readonly Task _mainLoop;
-	public BinaryStreamManager(ILogger<BinaryStreamManager> logger)
-	{
-		Logger = logger;
-		_mainLoop = Task.Run(async () => await DoLoop());
-	}
-	private readonly Channel<Arma3PayloadBinaryContent> _contentChannel = Channel.CreateUnbounded<Arma3PayloadBinaryContent>();
-
-	public readonly struct Content(
+	public sealed record class Content(
 		Arma3PayloadBinary metaData,
 		Stream writeStream,
-		SemaphoreSlim semaphore,
-		Action<Content>? action
-	)
+		Action<Content>? action = null
+	) : IDisposable
 	{
-		public void Deconstruct(
-			out Arma3PayloadBinary MetaData,
-			out Stream WriteStream,
-			out SemaphoreSlim Semaphore,
-			out Action<Content>? Action
-		)
+		public void Dispose()
 		{
-			MetaData = metaData;
-			WriteStream = writeStream;
-			Semaphore = semaphore;
-			Action = action;
+			GC.SuppressFinalize(this);
+			writeStream.Dispose();
 		}
-	}
-	private readonly ConcurrentDictionary<string, Content> ContentDictionary = new();
+	};
 
-	public bool TryGetBinaryValue(string identifier, out Arma3PayloadBinary metaData, out Stream writeStream)
+	private bool TryGetBinaryValueInternal(string identifier, out Content? content)
+		=> ContentDictionary.TryGetValue(identifier, out content);
+
+	public bool TryAddBinaryValue(string identifier, Arma3PayloadBinary metaData, Stream writeStream, Action<Content>? action = null)
 	{
-		var hasContent = ContentDictionary.TryGetValue(identifier, out var content);
-
-		(metaData, writeStream, _, _) = content;
-		ArgumentNullException.ThrowIfNull(metaData);
-		ArgumentNullException.ThrowIfNull(writeStream);
-
-		return hasContent;
-	}
-	private bool TryGetBinaryValueInternal(string identifier, out Arma3PayloadBinary metaData, out Stream writeStream, out SemaphoreSlim Semaphore, out Action<Content>? Action)
-	{
-		var hasContent = ContentDictionary.TryGetValue(identifier, out var content);
-
-		(metaData, writeStream, Semaphore, Action) = content;
-		ArgumentNullException.ThrowIfNull(metaData);
-		ArgumentNullException.ThrowIfNull(writeStream);
-		ArgumentNullException.ThrowIfNull(Semaphore);
-
-		return hasContent;
-	}
-	public bool TryAddBinaryValue(string identifier, Arma3PayloadBinary metaData, Stream writeStream, Action<Content>? action)
-	{
-		return ContentDictionary.TryAdd(identifier, new(metaData, writeStream, new(0), action));
-	}
-	public bool TryRemoveBinaryValue(string identifier, out Arma3PayloadBinary metaData, out Stream writeStream)
-	{
-		var removed = ContentDictionary.TryRemove(identifier, out var content);
-
-		(metaData, writeStream, var semaphore, _) = content;
-		semaphore.Dispose();
-		ArgumentNullException.ThrowIfNull(metaData);
-		ArgumentNullException.ThrowIfNull(writeStream);
-
-		return removed;
-	}
-	public bool TryPushBinaryContent(in Arma3PayloadBinaryContent content)
-	{
-		var (Identifier, _, _) = content;
-		if (!TryGetBinaryValue(Identifier, out _, out _))
-			ArgumentOutOfRangeException.ThrowIfNullOrEmpty(nameof(content), $"Binary value with identifier '{content.Identifier}' not found.");
-		return _contentChannel.Writer.TryWrite(content);
+		return ContentDictionary.TryAdd(identifier, new(metaData, writeStream, action));
 	}
 	public ValueTask PushBinaryContentAsync(Arma3PayloadBinaryContent content)
-	{
-		var (Identifier, _, _) = content;
-		if (!TryGetBinaryValue(Identifier, out _, out _))
-			ArgumentOutOfRangeException.ThrowIfNullOrEmpty(nameof(content), $"Binary value with identifier '{content.Identifier}' not found.");
+		=> _contentChannel.Writer.WriteAsync(content);
 
-		return _contentChannel.Writer.WriteAsync(content);
-	}
-	public async ValueTask WaitUntilBinaryStreamFinished(string identifier)
+	public async Task<(string identifier, Content content)> AddBinaryAsync(string identifier, Arma3PayloadBinary metaData, Stream writeStream)
 	{
-		if (!TryGetBinaryValueInternal(identifier, out _, out _, out var semaphore, out _))
-			ArgumentOutOfRangeException.ThrowIfNullOrEmpty(nameof(identifier), $"Binary value with identifier '{identifier}' not found.");
+		var content = ContentDictionary.GetOrAdd(identifier, _ => new(metaData, writeStream, null));
 
-		await semaphore.WaitAsync();
-		Logger.LogInformation("Binary stream finished for identifier: {Identifier}", identifier);
+		await ReadAllContentAsync(identifier);
+		return (identifier, content);
 	}
-	private async Task DoLoop()
+	private async Task ReadAllContentAsync(string identifier)
 	{
+		if (!ContentChannelDictionary.TryGetValue(identifier, out var contentChannel))
+			throw new ArgumentOutOfRangeException($"channel with identifier '{identifier}' not found.");
+
 		try
 		{
-			while (await _contentChannel.Reader.WaitToReadAsync())
+			await foreach (var binaryContent in contentChannel.Reader.ReadAllAsync())
 			{
-				while (_contentChannel.Reader.TryRead(out var content))
+				var (_, bytes, EndOfContent) = binaryContent;
+				if (!TryGetBinaryValueInternal(identifier, out var writtenContent))
 				{
-					var (identifier, bytes, EndOfContent) = content;
-
-					if (!TryGetBinaryValueInternal(identifier, out _, out var writeStream, out var semaphore, out var action))
-					{
-						Logger.LogWarning("Skip Binary value with identifier \"{identifier}\" not found.", identifier);
-						continue;
-					}
-
-					await writeStream.WriteAsync(bytes.AsMemory<byte>());
-
-					if (EndOfContent)
-					{
-						writeStream.Position = 0;
-						semaphore.Release();
-						ContentDictionary.Remove(identifier, out var WrittenContent);
-						action?.Invoke(WrittenContent);
-					}
+					Logger.LogWarning("Skip Binary value with identifier \"{identifier}\" not found.", identifier);
+					continue;
 				}
+
+				var (_, writeStream, action) = writtenContent!;
+				await writeStream.WriteAsync(bytes.AsMemory<byte>());
+
+				if (EndOfContent)
+				{
+					writeStream.Position = 0;
+					ContentDictionary.Remove(identifier, out _);
+					action?.Invoke(writtenContent);
+
+					writtenContent.Dispose(); //- Dispose content
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError(ex, "An error occurred while reading content for identifier '{identifier}'.", identifier);
+		}
+		finally
+		{
+			contentChannel.Writer.Complete();
+			ContentChannelDictionary.Remove(identifier, out _);
+		}
+	}
+
+	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+	{
+		Logger.LogInformation("{Service} service started. HashCode : {HashCode}", nameof(BinaryStreamManager), _contentChannel.GetHashCode());
+
+		try
+		{
+			await foreach (var binaryContent in _contentChannel.Reader.ReadAllAsync(stoppingToken))
+			{
+				var (identifier, _, _) = binaryContent;
+
+				var contentChannel = ContentChannelDictionary.GetOrAdd(identifier, _ => Channel.CreateBounded<Arma3PayloadBinaryContent>(100));
+				await contentChannel.Writer.WriteAsync(binaryContent, stoppingToken);
 			}
 		}
 		catch (OperationCanceledException) { }

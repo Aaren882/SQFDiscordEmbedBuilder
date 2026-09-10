@@ -1,4 +1,3 @@
-using System.Text;
 using Arma3WebService.Managers;
 using Components.Entity;
 
@@ -12,10 +11,12 @@ public sealed class DiscordBotRequestHandler(
 	private delegate ValueTask ReceivedAction(WebsocketServer connection, Arma3PayloadServiceRequest payload);
 	public ValueTask OnReceived(WebsocketServer connection, Arma3PayloadServiceRequest payload)
 	{
-		ReceivedAction action = (payload) switch
+		var ActionType = payload.ActionType;
+		ReceivedAction action = (ActionType) switch
 		{
-			{ ActionType: 1 } => ReceiveRptLineAction,
-			{ ActionType: 2 } => BinaryAction
+			1 => ReceiveRptLineAction,
+			2 => BinaryAction,
+			_ => throw new IndexOutOfRangeException($"Received unknown ActionType: {ActionType}")
 		};
 
 		return action(connection, payload);
@@ -39,7 +40,7 @@ public sealed class DiscordBotRequestHandler(
 				new MemoryStream(),
 				async (WrittenContent) =>
 				{
-					var (metaData, writeStream, _, _) = WrittenContent;
+					var (metaData, writeStream, _) = WrittenContent;
 					try
 					{
 						logger.LogDebug("Successfully processed binary file \"{FileName}\" for payload \"{PayloadId}\"", metaData.FileName, payloadId);
@@ -60,7 +61,6 @@ public sealed class DiscordBotRequestHandler(
 
 						logger.LogInformation("Received Binary File \"{FileName}\"", metaData.FileName);
 						DiscordBotAdminSubmitHelper.SubmittedModalSockets.Remove(request.RequestGuildId, out _);
-						await writeStream.DisposeAsync();
 					}
 					catch (OverflowException ex)
 					{
@@ -98,7 +98,7 @@ public sealed class DiscordBotRequestHandler(
 				new MemoryStream(),
 				async (WrittenContent) =>
 				{
-					var (metaData, writeStream, _, _) = WrittenContent;
+					var (metaData, writeStream, _) = WrittenContent;
 					logger.LogDebug("Successfully processed binary file \"{FileName}\" for payload \"{PayloadId}\"", metaData.FileName, payloadId);
 
 					await modalSocket.RespondWithFileAsync(
@@ -109,7 +109,6 @@ public sealed class DiscordBotRequestHandler(
 
 					logger.LogInformation("Received Binary File \"{FileName}\"", metaData.FileName);
 					DiscordBotAdminSubmitHelper.SubmittedModalSockets.Remove(request.RequestGuildId, out _);
-					await writeStream.DisposeAsync();
 				}
 			);
 		}
