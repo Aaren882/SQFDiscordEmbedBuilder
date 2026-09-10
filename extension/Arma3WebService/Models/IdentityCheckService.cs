@@ -1,7 +1,6 @@
 using Arma3WebService.DBContext;
 using Arma3WebService.DBContext.Repositories;
 using Arma3WebService.Entity;
-using Arma3WebService.Managers;
 using Components.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +11,6 @@ public class IdentityCheckService(
 	IServerIdentityRepository identityRepository,
 	IServerInfoTemplateRepository infoRepository,
 	IDiscordBotService discordBotService,
-	RemoteStateManager remoteStateManager,
 	ILogger<IdentityCheckService> logger
 )
 {
@@ -24,17 +22,17 @@ public class IdentityCheckService(
 		try
 		{
 			// The repository methods must now accept the 'transaction' parameter!
-			var exist = await identityRepository.GetByProfileNameAsync(profileName);
+			var exist = await identityRepository.GetByProfileNameAsync(profileName, tracked: false);
 
 			var messageId = string.IsNullOrEmpty(profileIdentity.MessageId)
 				? exist?.messageId ?? 0
 				: ulong.Parse(profileIdentity.MessageId!);
 
+			var serverInfoTemplate = await infoRepository.GetByMessageIdAsync(messageId, tracked: false);
+
 			var channelId = discordBotService.GetPresetMessageChannelId(DiscordBotChannel.Monitor);
 			var channel = await discordBotService.GetMessageChannelAsync(channelId);
 			var monitorMessage = messageId is 0 ? null : await channel.GetMessageAsync(messageId);
-
-			var serverInfoTemplate = await infoRepository.GetByMessageIdAsync(messageId);
 
 			// Handle message creation/cleanup
 			if (monitorMessage is null || serverInfoTemplate is null)
@@ -47,10 +45,7 @@ public class IdentityCheckService(
 					messageId = message.Id;
 				}
 
-				// The repository now tracks the creation/update, but does NOT save it.
 				var infoTemplate = await infoRepository.GetOrCreateTemplateAsync(messageId, profileIdentity.Configuration);
-
-				remoteStateManager.TryUpdateExistingServerInfoTemplateCache(messageId, infoTemplate);
 			}
 
 			// Update Identity
@@ -61,20 +56,24 @@ public class IdentityCheckService(
 							|| monitorMessage is null
 							|| serverInfoTemplate is null;
 
+			//- #TODO - Decuple this, they're sharing the same tracked object
+			dbContext.ChangeTracker.Clear();
 			if (isNewIdentity)
 			{
 				// The repository tracks the addition, but does NOT save it.
-				await identityRepository.AddServerIdentityAsync(new()
+				exist = new()
 				{
 					profileName = profileName,
 					messageId = messageId,
-					profileStateStamp = profileLastUpdate,
-				});
+					profileStateStamp = profileLastUpdate
+				};
+				await identityRepository.AddServerIdentityAsync(exist);
 			}
 			else if (isDifferent)
 			{
-				exist!.messageId = messageId;
-				exist!.lastUpdate = DateTime.Now;
+				ArgumentNullException.ThrowIfNull(exist);
+				exist.messageId = messageId;
+				exist.lastUpdate = DateTime.Now;
 				exist.profileStateStamp = profileLastUpdate;
 				// The repository tracks the update, but does NOT save it.
 				await identityRepository.UpdateServerIdentityAsync(exist);
