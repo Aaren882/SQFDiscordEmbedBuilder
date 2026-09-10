@@ -1,9 +1,10 @@
 using System.Text.Json.Serialization;
-using Arma3WebService.DBContext;
+using Arma3WebService.DBContext.Repositories;
 using Arma3WebService.Managers;
 using Arma3WebService.Models;
+using Component.DiscordEntity;
+using Components.Entity;
 using Discord;
-using Microsoft.EntityFrameworkCore;
 
 namespace Arma3WebService.Entity;
 
@@ -24,7 +25,7 @@ public abstract record Arma3PayloadExtended
 {
 	public abstract Arma3PayLoadTypeExtension Type { get; }
 	public static DateTime Timestamp => DateTime.Now;
-	public virtual Task Run(IServiceProvider serviceProvider, ServiceDbContext dbContext) => Task.CompletedTask;
+	public abstract Task Run(IServiceProvider serviceProvider, IServerIdentityRepository identityRepository, IServerInfoTemplateRepository infoRepository);
 }
 
 public record DiscordJsonExtension
@@ -35,17 +36,17 @@ public record DiscordJsonExtension
 {
 	[JsonIgnore]
 	public override Arma3PayLoadTypeExtension Type => Arma3PayLoadTypeExtension.DiscordSend;
-	
-	public override async Task Run(IServiceProvider serviceProvider, ServiceDbContext dbContext)
+
+	public override Task Run(IServiceProvider serviceProvider, IServerIdentityRepository identityRepository, IServerInfoTemplateRepository infoRepository)
 	{
 		var service = serviceProvider.GetRequiredService<IDiscordBotService>();
-		await SendMessage(service);
+		return SendMessage(service);
 	}
 
 	private Task<IUserMessage> SendMessage(IDiscordBotService service)
 	{
-		return ulong.TryParse(MessageId, out var id) ? 
-			service.ModifyMessageAsync(id, DiscordMessage) : 
+		return ulong.TryParse(MessageId, out var id) ?
+			service.ModifyMessageAsync(id, DiscordMessage) :
 			service.SendMessageAsync(
 				service.GetPresetMessageChannelId(DiscordBotChannel.Monitor),
 				DiscordMessage);
@@ -60,10 +61,11 @@ public record UpdateServerIdentityExtension
 {
 	[JsonIgnore]
 	public override Arma3PayLoadTypeExtension Type => Arma3PayLoadTypeExtension.UpdateServerIdentity;
-	public override async Task Run(IServiceProvider serviceProvider, ServiceDbContext dbContext)
+	public override async Task Run(IServiceProvider serviceProvider, IServerIdentityRepository identityRepository, IServerInfoTemplateRepository infoRepository)
 	{
-		await dbContext.UpdateServerIdentityMessageIdAsync(profileName, MessageId);
-		
+		await identityRepository.UpdateServerIdentityMessageIdAsync(profileName, MessageId);
+		await identityRepository.DbContext.SaveChangesAsync();
+
 		var messageId = ulong.Parse(MessageId);
 		var remoteStateManager = serviceProvider.GetRequiredService<RemoteStateManager>();
 		remoteStateManager.TryUpdateServerInfoMessageId(profileName, messageId);
@@ -79,109 +81,36 @@ public record UpdateServerInfoTemplateExtension
 	[JsonIgnore]
 	public override Arma3PayLoadTypeExtension Type => Arma3PayLoadTypeExtension.UpdateServerInfo;
 
-	public override async Task Run(IServiceProvider serviceProvider, ServiceDbContext dbContext)
+	public override async Task Run(IServiceProvider serviceProvider, IServerIdentityRepository identityRepository, IServerInfoTemplateRepository infoRepository)
 	{
 		var messageId = ulong.Parse(MessageId);
-		var exist = await dbContext.ServerInfoList.FirstOrDefaultAsync(x => x.messageId == messageId);
-		var updated = Configuration.CreateInfoTemplate(messageId);
-		
-		if (exist == null)
-		{
-			await dbContext.ServerInfoList.AddAsync(updated);
-		}
-		else
-		{
-			dbContext.Entry(exist).CurrentValues.SetValues(updated);
-		}
-		
-		await dbContext.SaveChangesAsync();
-		
-		//- Update cache for other services
-		var existIdentity = await dbContext.ServerIdentities.FirstAsync(x => x.messageId == messageId);
+
+		var existIdentity = await identityRepository.GetByMessageIdAsync(messageId);
+		ArgumentNullException.ThrowIfNull(existIdentity);
+
+		// Use the repository to handle fetching and creating/updating
+		// var (updated, existIdentity) = await infoRepository.GetOrCreateTemplateAndIdentityAsync(messageId, Configuration);
+		var updated = await infoRepository.GetOrCreateTemplateAsync(messageId, Configuration);
+		await infoRepository.DbContext.SaveChangesAsync();
+
+		// Update cache for other services
 		var remoteStateManager = serviceProvider.GetRequiredService<RemoteStateManager>();
-		remoteStateManager.TryUpdateExistingServerInfoTemplateCache(messageId, exist!);
+		remoteStateManager.TryUpdateExistingServerInfoTemplateCache(messageId, updated);
 		remoteStateManager.TryUpdateServerInfoMessageId(existIdentity.profileName, messageId);
 	}
-	/*public override async Task Run(IServiceProvider serviceProvider, ServiceDbContext dbContext)
-	{
-		var fileInfo = await CreateTemplate();
-		await dbContext.UpsertServerInfoTemplateAsync(fileInfo, MessageId);
-	}
-	private async Task<FileInfo> CreateTemplate()
-	{
-		var file = $".profile/ServerInfoTemplate/{MessageId}.json";
-		var directory = Path.GetDirectoryName(file);
-
-		if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
-		await File.WriteAllTextAsync(file, JsonContent, Encoding.UTF8);
-
-		return new FileInfo(file);
-	}*/
 }
 
-public record struct Arma3ClientProfileConfiguration
-{
-	private FileInfo? _messageTemplate;
-	private FileInfo? _messageOfflineTemplate;
-	private FileInfo? _messageActions;
 
-	public string? MessageTemplate
-	{
-		get => _messageTemplate?.FullName;
-		set {
-			if (value is not null) {
-				_messageTemplate = new FileInfo(
-					Path.GetFullPath($".profile/MessageTemplate/{Path.GetFileName(value)}")
-				);
-			}
-		}
-	}
-	
-	public string? MessageOfflineTemplate
-	{
-		get => _messageOfflineTemplate?.FullName;
-		set {
-			if (value is not null) {
-				_messageOfflineTemplate = new FileInfo(
-					Path.GetFullPath($".profile/MessageOfflineTemplate/{Path.GetFileName(value)}")
-				);
-			}
-		}
-	}
-
-	public string? MessageActions
-	{
-		get => _messageActions?.FullName;
-		set => _messageActions = new FileInfo(
-			Path.GetFullPath($".profile/MessageActions/{Path.GetFileName(value)}")
-		);
-	}
-
-	public ServerInfoTemplate CreateInfoTemplate(ulong messageId)
-	{
-		return new ServerInfoTemplate
-		{
-			messageId = messageId,
-			messageTemplatePath = MessageTemplate,
-			messageOfflinePath = MessageOfflineTemplate,
-			messageActionPath = MessageActions,
-		};
-	}
-}
-
-public record RegisterServerIdentity
-(
-	UpdateServerIdentityExtension Identity, //- Setup Message ID for profile
-	UpdateServerInfoTemplateExtension InfoTemplate //- Acquire JSON message template
-) : Arma3PayloadExtended
+public record RegisterServerIdentity(UpdateServerIdentityExtension Identity, UpdateServerInfoTemplateExtension InfoTemplate) : Arma3PayloadExtended
 {
 	[JsonIgnore]
 	public override Arma3PayLoadTypeExtension Type => Arma3PayLoadTypeExtension.RegisterServerIdentity;
 
-	public override async Task Run(IServiceProvider serviceProvider, ServiceDbContext dbContext)
+	public override async Task Run(IServiceProvider serviceProvider, IServerIdentityRepository identityRepository, IServerInfoTemplateRepository infoRepository)
 	{
-		foreach (var task in (IEnumerable<Arma3PayloadExtended>)[InfoTemplate, Identity])
-			await task.Run(serviceProvider, dbContext);
+		// The dependency injection framework is responsible for resolving the correct repositories
+		await Identity.Run(serviceProvider, identityRepository, infoRepository);
+		await InfoTemplate.Run(serviceProvider, identityRepository, infoRepository);
 	}
 };
 

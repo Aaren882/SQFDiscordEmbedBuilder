@@ -2,14 +2,15 @@ using System.Collections.Concurrent;
 using System.Net.Mime;
 using System.Net.WebSockets;
 using System.Text.Json;
-using Arma3WebService.DBContext;
+using Arma3WebService.Broker;
+using Arma3WebService.DBContext.Repositories;
 using Arma3WebService.Entity;
 using Arma3WebService.Extensions;
 using Arma3WebService.Handler;
 using Arma3WebService.Models;
+using Component.DiscordEntity;
 using Components.Entity;
 using Discord;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 
 namespace Arma3WebService.Managers;
@@ -19,8 +20,10 @@ public sealed class ServiceActionManager(
 	IServiceProvider serviceProvider,
 	IDiscordBotService discordBotService,
 	DiscordBotRequestHandler requestHandler,
+	UpdateDBActionBroker updateDBActionBroker,
 	BinaryStreamManager binaryStreamManager,
-	IDbContextFactory<ServiceDbContext> dbContextFactory
+	IServerIdentityRepository identityRepository,
+	IServerInfoTemplateRepository infoRepository
 )
 {
 	public ValueTask CallBackAction(WebsocketServer connection, Arma3PayloadCallBack command)
@@ -31,32 +34,18 @@ public sealed class ServiceActionManager(
 	{
 		return connection.SendAsync(payload.ToJsonString(), WebSocketMessageType.Text, true);
 	}
-	public ValueTask BinaryAction(WebsocketServer connection, Arma3PayloadBinary payload)
+
+	public async ValueTask UpdateDBAction(WebsocketServer connection, Arma3PayloadUpdateDB payload)
 	{
-		logger.LogInformation("Receiving metaData for binary file '{Payload}'", payload);
-		var (FileName, _, _, _, DirectoryPrefix) = payload;
+		logger.LogInformation("Receiving UpdateDBAction : '{RequestAction}'", payload);
 
-		if (DirectoryPrefix != null && !Directory.Exists(payload.DirectoryPrefix))
-			Directory.CreateDirectory(payload.DirectoryPrefix!);
-
-		var payloadId = payload.GetIdentifier(connection.websocketContext.GetIdentity());
-		FileStream fs = new(
-			Path.Combine(DirectoryPrefix ?? ".temp", FileName),
-			FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite
-		);
-		binaryStreamManager.TryAddBinaryValue(payloadId, payload, fs, async () => await fs.DisposeAsync());
-
-		return ValueTask.CompletedTask;
-	}
-	public async ValueTask BinaryContentAction(WebsocketServer connection, Arma3PayloadBinaryContent payload)
-	{
 		try
 		{
-			await binaryStreamManager.PushBinaryContentAsync(payload);
+			await updateDBActionBroker.AddAsync(connection, payload);
 		}
 		catch (Exception e)
 		{
-			logger.LogError(e, "\"{Action}\" threw an exception...", nameof(BinaryContentAction));
+			logger.LogError(e, "\"{Action}\" threw an exception...", nameof(ServiceRequestAction));
 			throw;
 		}
 	}
@@ -88,7 +77,7 @@ public sealed class ServiceActionManager(
 			);
 
 			ArgumentNullException.ThrowIfNull(JsonStringAction, nameof(JsonStringAction));
-			await JsonStringAction.Invoke(connection, serviceProvider, dbContextFactory);
+			await JsonStringAction.Invoke(connection, serviceProvider, identityRepository, infoRepository);
 		}
 		catch (Exception e)
 		{
@@ -125,9 +114,7 @@ public sealed class ServiceActionManager(
 	}
 	private async ValueTask UpdateDiscordServerInfoMessageAsync(string sessionIdentity, Dictionary<string, string> logItem)
 	{
-		await using var dbContext = await dbContextFactory.CreateDbContextAsync();
-
-		var serverIdentity = await dbContext.ServerIdentities.FirstOrDefaultAsync(o => o.profileName == sessionIdentity);
+		var serverIdentity = await identityRepository.GetByProfileNameAsync(sessionIdentity);
 
 		//- If messageId not set  
 		if (serverIdentity is null)
@@ -137,10 +124,11 @@ public sealed class ServiceActionManager(
 		}
 		if (serverIdentity.messageId is 0) return;
 
-		var serverInfo = dbContext.ServerInfoList.FirstOrDefault(o => o.messageId == serverIdentity.messageId);
+		var serverInfo = await infoRepository.GetByMessageIdAsync(serverIdentity.messageId);
 		if (serverInfo is null) return;
 
-		var infoMessage = await File.ReadAllTextAsync(serverInfo.messageTemplatePath!);
+		// var infoMessage = await File.ReadAllTextAsync(serverInfo.messageTemplatePath!);
+		var infoMessage = serverInfo.messageTemplate;
 		infoMessage = logItem.Aggregate(
 			infoMessage,
 			(current, item) => current.Replace(item.Key, item.Value)
