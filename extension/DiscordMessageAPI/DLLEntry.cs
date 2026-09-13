@@ -47,11 +47,7 @@ public class DllEntry
 		var serviceProvider = services.BuildServiceProvider();
 		
 		//- Setup Service Configuration
-		ExtensionStartup.InitConfiguration(
-			LoggerBase.Trace,
-			LoggerBase.Log,
-			serviceProvider
-		);
+		ExtensionStartup.InitConfiguration(serviceProvider);
 		
 		var version = typeof(DllEntry).GetTypeInfo().Assembly 
 			.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
@@ -61,7 +57,7 @@ public class DllEntry
 			.Substring(0, version.LastIndexOf('+') + 9);
 
 		LoggerBase.Log(null, $"Extension Version : [{version}]");
-		ExtensionStartup.localServices.Output(outputPrt, outputSize, version);
+		ExtensionStartup.LocalServices?.Output(outputPrt, outputSize, version);
 	}
 	
 	/// <summary>
@@ -135,6 +131,6 @@ public class DllEntry
 		var output = new OutputBuilder(outputPrt, outputSize);
 		var argsAction = new ArgsAction(output, args, functionName);
 
-		return ExtensionStartup.localServices.ExecuteArgsAction(argsAction);
+		return ExtensionStartup.LocalServices?.ExecuteArgsAction(argsAction) ?? -1;
 	}
 }

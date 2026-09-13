@@ -14,8 +14,8 @@ public record struct OutputBuilder(nint Destination, int OutputSize): IOutputBui
 	/// Construct output buffer for Arma
 	/// </summary>
 	/// <param name="data">String data that will be output</param>
-	public void Append(string data)
+	public readonly void Append(string data)
 	{
-		ExtensionStartup.localServices.Output(Destination, OutputSize, data);
+		ExtensionStartup.LocalServices?.Output(Destination, OutputSize, data);
 	}
 }

@@ -11,13 +11,14 @@ public sealed class ServiceRequestHandler
 	// private ConcurrentDictionary<Arma3PayloadServiceRequest, Task> _requestHandler = new(); 
 	internal async ValueTask RespondRequest(Arma3PayloadServiceRequest request)
 	{
-		var serviceInteractions = ServiceStartup.serviceInteractions;
+		var serviceInteractions = ServiceStartup.ServiceInteractions;
 		ArgumentNullException.ThrowIfNull(serviceInteractions);
 		await GetRespond(request);
 	}
 
 	private async ValueTask GetRespond(Arma3PayloadServiceRequest request)
 	{
+		var serviceInteractions = ServiceStartup.ServiceInteractions;
 		ArgumentNullException.ThrowIfNull(serviceInteractions);
 		ArgumentNullException.ThrowIfNull(RptFileDirectory);
 		FileInfo RPTFileInfo = new(RptFileDirectory);

@@ -50,7 +50,7 @@ public static class Util
 	}
 	public static string GetCurrentRpt()
 	{
-		var path = serviceInteractions?.RPTDirectory;
+		var path = ServiceInteractions?.RPTDirectory;
 		var dateTimeOffset = ExtensionInitTime;
 
 		Tracer(nameof(GetCurrentRpt), $"RPTDirectory : {path}, StartTimeOffset : {dateTimeOffset:F}");

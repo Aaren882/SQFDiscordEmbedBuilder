@@ -163,7 +163,7 @@ namespace DiscordMessageAPI
 			});
 			// var payload = new Arma3PayloadJson(jsonObj.ToString());
 			var message = JsonSerializer.Serialize(payload, Arma3PayloadJsonSerializerContext.Default.Arma3Payload);
-			ServiceStartup.serviceInteractions!.SendWebSocketMessage(message);
+			ServiceStartup.ServiceInteractions!.SendWebSocketMessage(message);
 
 
 			// var payload = new Arma3PayloadText("msg");
@@ -172,8 +172,8 @@ namespace DiscordMessageAPI
 
 
 
-			// var RPT = Util.GetLastestFile(ServiceStartup.serviceInteractions.RPTDirectory);
-			// await ServiceStartup.serviceInteractions.SendWebSocketBinary(RPT);
+			// var RPT = Util.GetLastestFile(ServiceStartup.ServiceInteractions.RPTDirectory);
+			// await ServiceStartup.ServiceInteractions.SendWebSocketBinary(RPT);
 
 			Console.ReadKey();
 
