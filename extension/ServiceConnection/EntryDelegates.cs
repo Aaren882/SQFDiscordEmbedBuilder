@@ -10,23 +10,24 @@ namespace ServiceConnection;
 
 public sealed class EntryDelegates : EntryDelegatesBase
 {
-	protected override ILogger<EntryDelegatesBase> Logger { get; set; }
-	public EntryDelegates(ILogger<EntryDelegates> Logger)
+	public EntryDelegates(ILogger<EntryDelegates> logger)
 	{
-		this.Logger = Logger;
+		Logger = logger;
 		ActionsDict = GetActionsMap(typeof(EntryDelegates));
 	}
 
-	internal int GetDirectoryFileNames(IOutputBuilder output, string[] args, int argCount)
+	internal static int GetDirectoryFileNames(IOutputBuilder output, string[] args, int argCount)
 	{
 		var path = args[0];
+		Logger.LogDebug("Getting directory file names for path: {Path}", path);
+
 		var fileNames = ServiceConnectionUtil.GetDirectoryFileNames(path);
 		output.Append($"[\"{string.Join("\",\"", fileNames)}\"]");
 
 		return fileNames.Count;
 	}
 
-	internal int GetDirectoryFilesDateTime(IOutputBuilder output, string[] args, int argCount)
+	internal static int GetDirectoryFilesDateTime(IOutputBuilder output, string[] args, int argCount)
 	{
 		var fileInfos = ServiceConnectionUtil.GetFilesFileInfos(args)
 			.Select(x =>
@@ -36,16 +37,16 @@ public sealed class EntryDelegates : EntryDelegatesBase
 		output.Append($"[\"{string.Join("\",\"", fileInfos)}\"]");
 		return fileInfos.Count;
 	}
-	internal int UpdateRptDirectory(IOutputBuilder output, string[] args, int argCount)
+	internal static int UpdateRptDirectory(IOutputBuilder output, string[] args, int argCount)
 	{
 		var dir = args[0];
 		ServiceInteractions.RPTDirectory = dir;
 		RptFileDirectory = ServiceConnectionUtil.GetCurrentRpt();
-		Logger.LogInformation("Update RPT File : {RptFileDirectory}", RptFileDirectory);
+		LoggerBase.Log(null, $"Update RPT File : {RptFileDirectory}");
 
 		return 1;
 	}
-	internal int GetCurrentRpt(IOutputBuilder output, string[] args, int argCount)
+	internal static int GetCurrentRpt(IOutputBuilder output, string[] args, int argCount)
 	{
 		output.Append(ServiceConnectionUtil.GetCurrentRpt());
 		return 1;
@@ -59,7 +60,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// <param name="argCount"></param>
 	/// <returns></returns>
 	/// <exception cref="Exception"></exception>
-	internal int ConnectWebSocket(IOutputBuilder output, string[] args, int argCount)
+	internal static int ConnectWebSocket(IOutputBuilder output, string[] args, int argCount)
 	{
 		var accessName = args[0];
 		var profilePayload = args[1];
@@ -77,7 +78,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// <param name="args"></param>
 	/// <param name="argCount"></param>
 	/// <returns></returns>
-	internal int DisconnectWebSocket(IOutputBuilder output, string[] args, int argCount)
+	internal static int DisconnectWebSocket(IOutputBuilder output, string[] args, int argCount)
 	{
 		_ = ShutdownAsync();
 		return 1;
@@ -89,7 +90,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// <param name="args"></param>
 	/// <param name="argCount"></param>
 	/// <returns></returns>
-	internal int ReconnectWebSocket(IOutputBuilder output, string[] args, int argCount)
+	internal static int ReconnectWebSocket(IOutputBuilder output, string[] args, int argCount)
 	{
 		var profilePayload = args[0];
 
@@ -104,7 +105,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// <param name="args"></param>
 	/// <param name="argCount"></param>
 	/// <returns></returns>
-	internal int SendWebSocketMessage(IOutputBuilder output, string[] args, int argCount)
+	internal static int SendWebSocketMessage(IOutputBuilder output, string[] args, int argCount)
 	{
 		var message = args[0];
 
@@ -112,7 +113,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 
 		return 1;
 	}
-	/*internal int SendWebSocketRPT(IOutputBuilder output, string[] args, int argCount)
+	/*internal static int SendWebSocketRPT(IOutputBuilder output, string[] args, int argCount)
 	{
 		var lastestRpt= Util.GetLatestFile(ServiceInteractions.RPTDirectory);
 		output.Append(lastestRpt); //- Return lastest Rpt directory
@@ -122,14 +123,14 @@ public sealed class EntryDelegates : EntryDelegatesBase
 
 		return 1;
 	}*/
-	internal int SendWebSocketBinaries(IOutputBuilder output, string[] args, int argCount)
+	internal static int SendWebSocketBinaries(IOutputBuilder output, string[] args, int argCount)
 	{
 		var binaryDict = JsonSerializer.Deserialize(args[0], ExtensionSerializable.Default.DictionaryStringString);
 		ServiceInteractions?.SendWebSocketBinaries(binaryDict!);
 
 		return 1;
 	}
-	internal int SendWebSocketRptLines(IOutputBuilder output, string[] args, int argCount)
+	internal static int SendWebSocketRptLines(IOutputBuilder output, string[] args, int argCount)
 	{
 		if (!int.TryParse(args[0], out var linesCount))
 			throw new Exception("INCORRECT NUMBER OF ARGUMENTS");
@@ -138,7 +139,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 
 		return 1;
 	}
-	internal int SendWebSocketBinariesFromAssemblyDirectory(IOutputBuilder output, string[] args, int argCount)
+	internal static int SendWebSocketBinariesFromAssemblyDirectory(IOutputBuilder output, string[] args, int argCount)
 	{
 		var binaryDict = JsonSerializer.Deserialize(args[0], ExtensionSerializable.Default.DictionaryStringString);
 
@@ -152,4 +153,5 @@ public sealed class EntryDelegates : EntryDelegatesBase
 
 		return 1;
 	}
+	// }
 }

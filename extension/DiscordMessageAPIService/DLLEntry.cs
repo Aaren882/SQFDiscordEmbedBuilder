@@ -12,6 +12,14 @@ namespace DiscordMessageAPIService;
 
 public sealed class DllEntry
 {
+	private const ulong RVFeature_ArgumentNoEscapeString = 1UL << 2; // 0x04
+
+	[UnmanagedCallersOnly(EntryPoint = "RVExtensionFeatureFlags")]
+	public static ulong RVExtensionFeatureFlags()
+	{
+		return RVFeature_ArgumentNoEscapeString;
+	}
+
 	/// <summary>
 	/// Register callback for Arma
 	/// </summary>
@@ -40,9 +48,9 @@ public sealed class DllEntry
 	public static void RVExtensionVersion(nint outputPrt, int outputSize)
 	{
 		ServiceCollection services = new();
+		services.AddSingleton<EntryDelegatesBase, EntryDelegates>();
 		services.AddSingleton<ServiceInteractions>();
 		services.AddSingleton<ILocalServices, LocalServices>();
-		services.AddSingleton<EntryDelegatesBase, EntryDelegates>();
 		services.AddSingleton<ServiceRequestHandler>();
 		services.AddSingleton<WebsocketClient>();
 		services.SetupFileLogger();
@@ -113,25 +121,11 @@ public sealed class DllEntry
 	///     numbers
 	/// </returns>
 	[UnmanagedCallersOnly(EntryPoint = "RVExtensionArgs")]
-	public static int RvExtensionArgs(nint outputPrt, int outputSize, nint function, nint argsPrt, int argCount)
+	public static int RvExtensionArgs(nint outputPrt, int outputSize, nint functionPtr, nint argsPrt, int argCount)
 	{
-		var args = new string[argCount];
-		for (var i = 0; i < argCount; i++)
-		{
-			var str = Marshal.PtrToStringUTF8(
-					Marshal.ReadIntPtr(argsPrt + (i * Marshal.SizeOf<nint>()))
-				)!
-				.Trim('"', ' ') //- Remove Arma quotations
-				.Replace("\"\"", "\"");
-
-			args[i] = str;
-			LoggerBase.Trace($"DLL Entry => \"{i}\"", $"\"str = {str}\"");
-			//args = args.Select(arg => arg.Trim('"', ' ').Replace("\"\"", "\"")).ToArray();
-		}
-
-		var functionName = Marshal.PtrToStringUTF8(function)!;
 		OutputBuilder output = new(outputPrt, outputSize);
-		ArgsAction argsAction = new(output, args, functionName);
+		ArgsBuilder args = new(argsPrt, argCount);
+		ArgsAction argsAction = new(output, args, functionPtr);
 
 		return ExtensionStartup.LocalServices?.ExecuteArgsAction(argsAction) ?? -1;
 	}

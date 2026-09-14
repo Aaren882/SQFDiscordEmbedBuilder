@@ -10,24 +10,19 @@ namespace DiscordMessageAPI;
 
 public sealed class EntryDelegates : EntryDelegatesBase
 {
-	protected override ILogger<EntryDelegatesBase> Logger { get; set; }
-	public EntryDelegates(ILogger<EntryDelegates> Logger)
+	public EntryDelegates(ILogger<EntryDelegates> logger)
 	{
-		this.Logger = Logger;
+		Logger = logger;
 		ActionsDict = GetActionsMap(typeof(EntryDelegates));
 	}
 
-	/* private sealed class Actions
-	{
-
-	} */
 	/// <summary>
 	/// Initation for Clients (Players)
 	/// </summary>
 	/// <param name="output"></param>
 	/// <param name="args"></param>
 	/// <returns></returns>
-	internal int Init_Player(IOutputBuilder output, string[] args, int argCount)
+	internal static int Init_Player(IOutputBuilder output, string[] args, int argCount)
 	{
 		if (ExtensionWebhookInit)
 		{
@@ -38,7 +33,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 		return 1;
 	}
 
-	internal int Init_Server(IOutputBuilder output, string[] args, int argCount)
+	internal static int Init_Server(IOutputBuilder output, string[] args, int argCount)
 	{
 		// var webhooksCount = 0;
 		// if (ExtensionWebhookInit) return webhooksCount;
@@ -53,7 +48,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// <param name="output"></param>
 	/// <param name="args"></param>
 	/// <returns></returns>
-	internal int Refresh_Webhooks(IOutputBuilder output, string[] args, int argCount)
+	internal static int Refresh_Webhooks(IOutputBuilder output, string[] args, int argCount)
 	{
 		var jsonString = Util.ParseJson("Webhooks.json");
 		Tracer("Refresh_Webhooks", jsonString);
@@ -89,7 +84,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// parse.</param>
 	/// <param name="argCount">The number of arguments provided in the args array.</param>
 	/// <returns>Always returns 1 to indicate successful processing of the first argument.</returns>
-	internal int ParseJson(IOutputBuilder output, string[] args, int argCount)
+	internal static int ParseJson(IOutputBuilder output, string[] args, int argCount)
 	{
 		var json = Util.ParseJson(args[0]);
 		output.Append(json);
@@ -104,7 +99,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// <param name="args">An array of command-line arguments to process.</param>
 	/// <param name="argCount">The number of arguments provided in the <paramref name="args"/> array.</param>
 	/// <returns>Always returns 1 to indicate successful handling of the command.</returns>
-	internal int HandlerJson(IOutputBuilder output, string[] args, int argCount)
+	internal static int HandlerJson(IOutputBuilder output, string[] args, int argCount)
 	{
 		_ = Worker.HandlerJson(args);
 		return 1;
@@ -117,7 +112,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// <param name="args">An array of arguments, where the first element is expected to be a JSON-formatted string to process.</param>
 	/// <param name="argCount">The number of arguments provided in the <paramref name="args"/> array.</param>
 	/// <returns>Always returns 1 to indicate successful processing.</returns>
-	internal int HandlerJsonFormat(IOutputBuilder output, string[] args, int argCount)
+	internal static int HandlerJsonFormat(IOutputBuilder output, string[] args, int argCount)
 	{
 		_ = Worker.HandlerJsonFormat(args);
 		return 1;
@@ -134,7 +129,7 @@ public sealed class EntryDelegates : EntryDelegatesBase
 	/// <param name="argCount">The number of arguments provided in the <paramref name="args"/> array. Must be exactly 8.</param>
 	/// <returns>An integer value of 1 if the message is processed and sent successfully.</returns>
 	/// <exception cref="Exception">Thrown if <paramref name="argCount"/> is not equal to 8.</exception>
-	internal int SendMessage(IOutputBuilder output, string[] args, int argCount)
+	internal static int SendMessage(IOutputBuilder output, string[] args, int argCount)
 	{
 		if (argCount != 8) // async without await because we don't expect a reply
 			throw new Exception("INCORRECT NUMBER OF ARGUMENTS");

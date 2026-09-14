@@ -19,7 +19,7 @@ public static class ExtensionStartup
 	public static ExtensionCallback Callback = (name, function, data) => 0;
 
 	public static IServiceProvider? ServiceProvider { get; private set; }
-	public static EntryDelegatesBase? EntryDelegates { get; private set; }
+	// public static EntryDelegatesBase? EntryDelegates { get; private set; }
 	public static ILocalServices? LocalServices { get; private set; }
 
 	public static void InitConfiguration(IServiceProvider serviceProvider)
@@ -29,8 +29,6 @@ public static class ExtensionStartup
 		try
 		{
 			LocalServices = serviceProvider.GetRequiredService<ILocalServices>();
-			EntryDelegates = serviceProvider.GetRequiredService<EntryDelegatesBase>();
-			LocalServices.SetActionsMap(EntryDelegates);
 			Logger(null, $"({nameof(ExtensionStartup)}) Local Services Initialized");
 		}
 		catch (Exception e)
