@@ -24,7 +24,7 @@ public static class LoggerBase// : ILoggerInternal
 				options.UsePlainTextFormatter(formatter =>
 				{
 					formatter.SetPrefixFormatter($"{0} ({2}) [{1:short}] ", (in MessageTemplate template, in LogInfo info) => template.Format($"{info.Timestamp.Local.DateTime:HH-mm-ss}", info.LogLevel, info.Category));
-					formatter.SetExceptionFormatter((writer, ex) => Utf8StringInterpolation.Utf8String.Format(writer, $"{ex.Message}"));
+					formatter.SetExceptionFormatter((writer, ex) => Utf8StringInterpolation.Utf8String.Format(writer, $"{ex}"));
 				});
 			}
 		);
