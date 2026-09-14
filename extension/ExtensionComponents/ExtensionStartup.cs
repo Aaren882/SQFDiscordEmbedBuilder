@@ -19,7 +19,6 @@ public static class ExtensionStartup
 	public static ExtensionCallback Callback = (name, function, data) => 0;
 
 	public static IServiceProvider? ServiceProvider { get; private set; }
-	// public static EntryDelegatesBase? EntryDelegates { get; private set; }
 	public static ILocalServices? LocalServices { get; private set; }
 
 	public static void InitConfiguration(IServiceProvider serviceProvider)

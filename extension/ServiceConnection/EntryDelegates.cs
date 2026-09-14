@@ -153,5 +153,4 @@ public sealed class EntryDelegates : EntryDelegatesBase
 
 		return 1;
 	}
-	// }
 }
