@@ -1,5 +1,15 @@
 namespace ExtensionComponents.Entity;
 
+[Flags]
+public enum RVFeatureFlags : ulong
+{
+	None = 0,
+	ContextArgumentsVoidPtr = 1 << 0, // 1
+	ContextStackTrace = 1 << 1, // 2
+	ContextNoDefaultCall = 1 << 2, // 4
+	ArgumentNoEscapeString = 1 << 3, //- 8
+}
+
 public interface ILocalServices
 {
 	void Output(nint destination, int outputSize, string data);

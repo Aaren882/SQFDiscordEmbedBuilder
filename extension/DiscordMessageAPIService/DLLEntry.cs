@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using ExtensionComponents;
@@ -13,12 +13,15 @@ namespace DiscordMessageAPIService;
 
 public sealed class DllEntry
 {
-	private const ulong RVFeature_ArgumentNoEscapeString = 1UL << 2; // 0x04
-
-	[UnmanagedCallersOnly(EntryPoint = "RVExtensionFeatureFlags")]
+	/* [UnmanagedCallersOnly(EntryPoint = "RVExtensionFeatureFlags")]
 	public static ulong RVExtensionFeatureFlags()
 	{
-		return RVFeature_ArgumentNoEscapeString;
+		return (ulong)(
+			// RVFeatureFlags.ContextNoDefaultCall | //- Turn-off Call Context automatically
+			RVFeatureFlags.ArgumentNoEscapeString
+		);
+	} */
+
 	}
 
 	/// <summary>
