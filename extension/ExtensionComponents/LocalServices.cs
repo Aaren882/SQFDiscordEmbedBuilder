@@ -29,7 +29,30 @@ public class LocalServices(ILogger<LocalServices> Logger, EntryDelegatesBase ent
 		}
 	}
 
-	public int ExecuteArgsAction(IArgsAction argsAction)
+	public unsafe CallContext? GetCallContext(nint argsPtr, int argCount)
+	{
+		if (argsPtr == nint.Zero) return null;
+
+		var sourcePtr = (byte**)argsPtr;
+		ReadOnlySpan<nint> sourceSpan = new(sourcePtr, argCount);
+
+		var result = new string[argCount];
+		for (var i = 0; i < argCount; i++)
+		{
+			var rawString = Marshal.PtrToStringUTF8(sourceSpan[i]) ?? string.Empty;
+			Logger.LogDebug("{nameof}: {rawString}", nameof(rawString), rawString);
+			result[i] = rawString;
+		}
+
+		return new CallContext(
+			UInt64.Parse(result[0]),
+			result[1],
+			result[2],
+			result[3],
+			short.Parse(result[4])
+		);
+	}
+
 	{
 		Logger.LogDebug("ExecuteArgsAction(IArgsAction argsAction)");
 		var (output, args, functionPtr) = argsAction.GetParams();

@@ -22,6 +22,27 @@ public sealed class DllEntry
 		);
 	} */
 
+	/// <summary>
+	/// Receives context information .
+	/// </summary>from Arma 3 about the execution environment
+	/// <param name="argsPtr">Pointer to the array of strings containing context data.</param>
+	/// <param name="argCount">The number of arguments passed in the context.</param>
+	[UnmanagedCallersOnly(EntryPoint = "RVExtensionContext")]
+	public static void RVExtensionContext(nint argsPtr, int argCount)
+	{
+		try
+		{
+			var context = ExtensionStartup.LocalServices?.GetCallContext(argsPtr, argCount);
+			if (context is null)
+				throw new NullReferenceException("CallContext parse failed.");
+
+			ContextInfo = context;
+			LoggerBase.Trace(nameof(ContextInfo), ContextInfo.ToString());
+		}
+		catch (Exception ex)
+		{
+			LoggerBase.Log(ex, nameof(RVExtensionContext));
+		}
 	}
 
 	/// <summary>
@@ -74,33 +95,7 @@ public sealed class DllEntry
 		ExtensionStartup.LocalServices?.Output(outputPrt, outputSize, version);
 	}
 
-	/// <summary>
-	/// Receives context information .
-	/// </summary>from Arma 3 about the execution environment
-	/// <param name="argsPtr">Pointer to the array of strings containing context data.</param>
-	/// <param name="argCount">The number of arguments passed in the context.</param>
-	[UnmanagedCallersOnly(EntryPoint = "RVExtensionContext")]
-	public static void RVExtensionContext(nint argsPtr, int argCount)
-	{
-		var args = new string?[argCount];
-
-		for (var i = 0; i < argCount; i++)
-		{
-			var str = Marshal.PtrToStringUTF8(Marshal.ReadIntPtr(argsPtr + (i * Marshal.SizeOf<nint>())));
-			args[i] = str;
-		}
-
-		ContextInfo = new CallContext(
-			Convert.ToUInt64(args[0]),
-			args[1]!,
-			args[2]!,
-			args[3]!,
-			Convert.ToInt16(args[4])
-		);
-		LoggerBase.Trace(nameof(ContextInfo), ContextInfo.ToString());
-	}
-
-	/// <summary>
+	/* /// <summary>
 	/// The entry point for the default callExtension command.
 	/// </summary>
 	/// <param name="outputPrt">The string builder object that contains the result of the function</param>
