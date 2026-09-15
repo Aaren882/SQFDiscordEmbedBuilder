@@ -14,6 +14,7 @@ public interface ILocalServices
 {
 	void Output(nint destination, int outputSize, string data);
 	CallContext? GetCallContext(nint argsPtr, int argCount);
+	int ExecuteArgsAction(nint outputPrt, int outputSize, nint functionPtr, nint argsPrt, int argCount);
 	int ExecuteArgsAction(IArgsAction argsAction);
 	ReadOnlySpan<byte> GetUtf8Span(nint pointer);
 }

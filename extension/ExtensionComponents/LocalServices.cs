@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text;
 using ExtensionComponents.Entity;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,10 @@ public class LocalServices(ILogger<LocalServices> Logger, EntryDelegatesBase ent
 	{
 		//- Execution Time: 0.1319 ms  |  Cycles: 7583/10000  (ORIGIN)
 		//- Execution Time: 0.1290 ms  |  Cycles: 7751/10000  (Improved "output()")
-		//- Execution Time: 0.0293 ms  |  Cycles: 10000/10000 (Improved "output()" + Improved Args parsing + "RVFeature_ArgumentNoEscapeString")
+		//- Execution Time: 0.1164 ms  |  Cycles: 8593/10000  (Improved "output()" + Improved Args parsing)
+		//- Execution Time: 0.0713 ms  |  Cycles: 10000/10000 (Improved "output()" + Improved Args parsing + Improved RVContext parsing)
+		//- Execution Time: 0.0293 ms  |  Cycles: 10000/10000 (Improved "output()" + Improved Args parsing + "RVFeature_ArgumentNoEscapeString" + "RVFeature_RvContextNoDefaultCall")
+		//- Execution Time: 0.0084 ms  |  Cycles: 10000/10000 (Improved "output()" + Improved Args parsing + "RVFeature_ArgumentNoEscapeString" + NO RVExtensionContext)
 		try
 		{
 			//- less overhead
@@ -53,14 +57,20 @@ public class LocalServices(ILogger<LocalServices> Logger, EntryDelegatesBase ent
 		);
 	}
 
+	public int ExecuteArgsAction(nint outputPrt, int outputSize, nint functionPtr, nint argsPrt, int argCount)
+	{
+		OutputBuilder output = new(outputPrt, outputSize);
+		ArgsBuilder args = new(argsPrt, argCount);
+		ArgsAction argsAction = new(output, args, functionPtr);
+
+		return ExecuteArgsAction(argsAction);
+	}
+	public unsafe int ExecuteArgsAction(IArgsAction argsAction)
 	{
 		Logger.LogDebug("ExecuteArgsAction(IArgsAction argsAction)");
 		var (output, args, functionPtr) = argsAction.GetParams();
 		Logger.LogDebug("{argsAction}", argsAction);
-		return ExecuteArgsAction(output, args, functionPtr);
-	}
-	public unsafe int ExecuteArgsAction(IOutputBuilder Output, string[] Args, nint functionPtr)
-	{
+
 		try
 		{
 			var functionSpan = GetUtf8Span(functionPtr);
@@ -71,14 +81,14 @@ public class LocalServices(ILogger<LocalServices> Logger, EntryDelegatesBase ent
 			if (!entryDelegates.ActionsDict.TryGetValue(functionSpan, out var actionPtr))
 				throw new NullReferenceException($"Function \"{functionString}\" is not exist.");
 
-			Logger.LogDebug("Function Found! Passing arguments ({Output}, {Args}, {ArgsCount})", Output, Args, Args.Length);
+			Logger.LogDebug("Function Found! Passing arguments ({output}, {args}, {ArgsCount})", output, args, args.Length);
 
 			var action = (delegate* managed<IOutputBuilder, string[], int, int>)actionPtr;
-			return action(Output, Args, Args.Length);
+			return action(output, args, args.Length);
 		}
 		catch (Exception e)
 		{
-			Output.Append($"Error!! \"{e.Message}\"");
+			output.Append($"Error!! \"{e.Message}\"");
 			Logger.LogError(e, "Error during {MethodName} execution.", nameof(ExecuteArgsAction));
 
 			return -11;
@@ -101,5 +111,4 @@ public class LocalServices(ILogger<LocalServices> Logger, EntryDelegatesBase ent
 		// 2. Create the byte span directly from the memory address
 		return new(bytePtr, length);
 	}
-
 }

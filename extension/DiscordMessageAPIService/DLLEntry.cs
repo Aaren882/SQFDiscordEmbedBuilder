@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using ExtensionComponents;
 using ExtensionComponents.Entity;
 using ExtensionComponents.Tools;
@@ -101,7 +100,7 @@ public sealed class DllEntry
 	/// <param name="outputPrt">The string builder object that contains the result of the function</param>
 	/// <param name="outputSize">The maximum size of bytes that can be returned</param>
 	/// <param name="function">The string argument that is used along with callExtension</param>
-	/* [UnmanagedCallersOnly(EntryPoint = "RVExtension")]
+	[UnmanagedCallersOnly(EntryPoint = "RVExtension")]
 	public static void RVExtension(nint outputPrt, int outputSize, nint function)
 	{
 		// var inputKey = Marshal.PtrToStringUTF8(function)!;
@@ -122,10 +121,8 @@ public sealed class DllEntry
 	[UnmanagedCallersOnly(EntryPoint = "RVExtensionArgs")]
 	public static int RvExtensionArgs(nint outputPrt, int outputSize, nint functionPtr, nint argsPrt, int argCount)
 	{
-		OutputBuilder output = new(outputPrt, outputSize);
-		ArgsBuilder args = new(argsPrt, argCount);
-		ArgsAction argsAction = new(output, args, functionPtr);
-
-		return ExtensionStartup.LocalServices?.ExecuteArgsAction(argsAction) ?? -1;
+		return
+			ExtensionStartup.LocalServices?.ExecuteArgsAction(outputPrt, outputSize, functionPtr, argsPrt, argCount)
+			?? -1;
 	}
 }
